@@ -21,7 +21,10 @@ namespace EvolutionaryAlgorithmApp
     public partial class MainWindow : Window
     {
         public MainWindow()
-        {
+        { 
+            // maja byc fajne punkty na pareto front takie ze mozna na nie kliknac i zeby byly identyfikowalne na dziedzinie
+            // np rozne kolory na wykresie dziedziny, żeby było wiadomo jakie punkty są odwzorowane
+            // 28 maja oddanie programu
             InitializeComponent();
         }
     }

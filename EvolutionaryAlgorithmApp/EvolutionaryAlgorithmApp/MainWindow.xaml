@@ -5,8 +5,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EvolutionaryAlgorithmApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Icon="Images\favicon.png"
+        Title="Evolutionary Morons" Height="720" Width="1280" MinHeight="360" MinWidth="640">
+    <Window.Background>
+        <LinearGradientBrush EndPoint="1,0" MappingMode="RelativeToBoundingBox" StartPoint="1,1">
+            <GradientStop Color="#FF054B35" Offset="0.004"/>
+            <GradientStop Color="#FF008706" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
+    <Viewbox StretchDirection="Both" Stretch="UniformToFill">
+        <Grid Width="1280" Height="720">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="319*"/>
+                <RowDefinition Height="401*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="298*"/>
+                <ColumnDefinition Width="579*"/>
+                <ColumnDefinition Width="403*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FFF3F3F3" Offset="0"/>
+                    <GradientStop Color="#FF9CEE94" Offset="1"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+        </Grid>
+    </Viewbox>
 </Window>
