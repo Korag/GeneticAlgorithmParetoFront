@@ -24,7 +24,16 @@ namespace EvolutionaryAlgorithmApp
         { 
             // maja byc fajne punkty na pareto front takie ze mozna na nie kliknac i zeby byly identyfikowalne na dziedzinie
             // np rozne kolory na wykresie dziedziny, żeby było wiadomo jakie punkty są odwzorowane
-            // 28 maja oddanie programu
+            // 28 maja oddanie programu !!!!!!!!!! potwierdzone info 
+
+
+            // 2 populacje musza migac 
+            // wykres iteracji --> suma, min f1 , min f2
+
+            // w sprawozdaniu odleglosc pareto frontu od rozwiazania teoretycznego
+
+            // suma po wszystkich punktach w populacji (od i do licznosci pareto frontu) |f(f1) - f2|
+
             InitializeComponent();
         }
     }
