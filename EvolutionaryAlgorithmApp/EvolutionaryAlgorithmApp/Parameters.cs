@@ -15,9 +15,24 @@ namespace EvolutionaryAlgorithmApp
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public string Name { get; set; } = "dsfsdf";
-
         public ChartValues<ObservablePoint> ListOfPoints { get; set; } = new ChartValues<ObservablePoint>();
 
+
+        public string F1Formula { get; set; } = "Evol";
+        public string F2Formula { get; set; } = "Morons";
+        public double F1LeftConstraint { get; set; }
+        public double F1RightConstraint { get; set; }
+        public double F2LeftConstraint { get; set; }
+        public double F2RightConstraint { get; set; }
+        public int Popsize { get; set; }
+        public double PlausOfMutation { get; set; }
+        public double PlausOfCrossing { get; set; }
+        public string Minimum { get; set; }
+        public int SleepTime{ get; set; }
+        public int IterationLimit{ get; set; }
+
+        //  iteracje, X, Y
+        public double[][][] Population; // [2][popsize][popsize]
 
     }
 }

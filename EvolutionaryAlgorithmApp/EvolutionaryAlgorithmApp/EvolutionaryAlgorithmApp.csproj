@@ -69,9 +69,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Crossing.cs" />
-    <Compile Include="Mutation.cs" />
-    <Compile Include="Selection.cs" />
     <Compile Include="UserControls\CartesianChartUserCtrl.xaml.cs">
       <DependentUpon>CartesianChartUserCtrl.xaml</DependentUpon>
     </Compile>
