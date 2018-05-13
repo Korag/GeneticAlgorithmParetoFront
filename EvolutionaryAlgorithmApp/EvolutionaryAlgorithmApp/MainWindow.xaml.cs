@@ -16,6 +16,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.ComponentModel;
+using Troschuetz.Random.Distributions.Continuous;
+using Troschuetz.Random.Generators;
+using Troschuetz.Random;
 
 namespace EvolutionaryAlgorithmApp
 {
@@ -24,25 +28,27 @@ namespace EvolutionaryAlgorithmApp
     /// </summary>
     /// 
 
-    // niedzialajacy bullshit
-    public static class ExtensionMethods
-    {
-        private static Action EmptyDelegate = delegate () { };
 
 
-        public static void Refresh(this CartesianChartUserCtrl uiElement)
-
-        {
-            uiElement.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
-        }
-    }
 
     public partial class MainWindow : Window
     {
-        Parameters parameters;
+        private readonly BackgroundWorker worker = new BackgroundWorker();
+        private Parameters _parameters;
         Random r = new Random();
+
+        private int Pop_Size;
+        private double F1LeftConstraint;
+        private double F1RightConstraint;
+        private double F2LeftConstraint;
+        private double F2RightConstraint;
+        private double Sleeper;
+
+
+
         public MainWindow()
         {
+
             // maja byc fajne punkty na pareto front takie ze mozna na nie kliknac i zeby byly identyfikowalne na dziedzinie
             // np rozne kolory na wykresie dziedziny, żeby było wiadomo jakie punkty są odwzorowane
             // 28 maja oddanie programu !!!!!!!!!! potwierdzone info 
@@ -58,17 +64,44 @@ namespace EvolutionaryAlgorithmApp
 
             InitializeComponent();
 
+
+            worker.DoWork += worker_DoWork;
+            worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+
             // Binding
-            parameters = new Parameters();
-            this.DataContext = parameters;
+            _parameters = new Parameters();
+            this.DataContext = _parameters;
 
-  
+            ReinitializeVariables();
 
-            // testy 
-            parameters.ListOfPoints.Add(new ObservablePoint(r.NextDouble() * 10, r.NextDouble() * 10));
+        }
 
-            wykres.EditSeriesCollection(parameters.ListOfPoints);
+        private void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) { if (!worker.IsBusy) Start.IsEnabled = true; }
 
+
+        private void worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            var trandom = new TRandom();
+            for (int i = 0; i < Pop_Size; i++)
+            {
+                Thread.Sleep((int)(Sleeper * 1000));
+                _parameters.ListOfPoints.Add(new ObservablePoint(trandom.NextDouble(F1LeftConstraint,F1RightConstraint), trandom.NextDouble(F2LeftConstraint, F2RightConstraint)));
+                wykres.EditSeriesCollection(_parameters.ListOfPoints);
+            }
+
+        }
+
+
+        private void ReinitializeVariables()
+        {
+            //przez to ze strona jest zbindowana do parameters musimy reinicjowac, bo dane z gui sa przesylane tylko do parameters
+            Pop_Size = _parameters.Popsize;
+            F1LeftConstraint = _parameters.F1LeftConstraint;
+            F1RightConstraint = _parameters.F1RightConstraint;
+            F2LeftConstraint = _parameters.F2LeftConstraint;
+            F2RightConstraint = _parameters.F2RightConstraint;
+            Sleeper = _parameters.SleepTime;
+            _parameters.ListOfPoints = new LiveCharts.ChartValues<ObservablePoint>();
         }
 
         // Serce programu wszystko bedzie odbwac sie wlasnie tutaj
@@ -83,7 +116,7 @@ namespace EvolutionaryAlgorithmApp
             while (true)
             {
                 // czas na obserwacje popsize'a i wykresu wartosci funkcji
-                Thread.Sleep(parameters.SleepTime);
+                Thread.Sleep(_parameters.SleepTime);
 
                 // wszystkie operacje wykonujemy na tablicy znajdujacej sie w Parameters   public double[][][] Population; // [2][popsize][popsize]
 
@@ -151,22 +184,15 @@ namespace EvolutionaryAlgorithmApp
 
         private void Start_Click(object sender, RoutedEventArgs e)
         {
-            blabla();
-
+            Start.IsEnabled = false;
+            ReinitializeVariables();
+            worker.RunWorkerAsync();
+            
         }
 
-        private void blabla()
-        {
-            int i = 0;
-            while (i < 10)
-            {
-                Thread.Sleep(500);
-                parameters.ListOfPoints.Add(new ObservablePoint(r.NextDouble() * 10, r.NextDouble() * 10));
-                wykres.EditSeriesCollection(parameters.ListOfPoints);
-                wykres.Refresh();
-                i++;
-            }
-        }
+
+
+
 
         private void Stop_Click(object sender, RoutedEventArgs e)
         {

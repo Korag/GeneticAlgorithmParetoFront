@@ -42,9 +42,9 @@ namespace EvolutionaryAlgorithmApp.UserControls
             get { return _Parameters.ListOfPoints; }
             set { _Parameters.ListOfPoints = value; }
         }
-        public ChartValues<ObservablePoint> ValuesA { get; set; }
-        public ChartValues<ObservablePoint> ValuesB { get; set; }
-        public ChartValues<ObservablePoint> ValuesC { get; set; }
+        public ChartValues<ObservablePoint> ValuesA { get; set; } = null;
+        public ChartValues<ObservablePoint> ValuesB { get; set; } = null;
+        //public ChartValues<ObservablePoint> ValuesC { get; set; }
 
         public CartesianChartUserCtrl()
         {
@@ -53,14 +53,7 @@ namespace EvolutionaryAlgorithmApp.UserControls
             var r = new Random();
             ValuesA = new ChartValues<ObservablePoint>();
             ValuesB = new ChartValues<ObservablePoint>();
-            ValuesC = new ChartValues<ObservablePoint>();
 
-            for (var i = 0; i < 20; i++)
-            {
-                ValuesA.Add(new ObservablePoint(r.NextDouble() * 10, r.NextDouble() * 10));
-                ValuesB.Add(new ObservablePoint(r.NextDouble() * 10, r.NextDouble() * 10));
-                ValuesC.Add(new ObservablePoint(r.NextDouble() * 10, r.NextDouble() * 10));
-            }
 
             DataContext = this;
 

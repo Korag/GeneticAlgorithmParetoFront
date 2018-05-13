@@ -49,7 +49,7 @@
             <Label Content="F1" Height="49"  Margin="10,110,279,242" Style="{DynamicResource Label}"/>
             <Label Content="F2" Height="49"  Margin="10,159,279,193" Style="{DynamicResource Label}"/>
             <TextBox HorizontalAlignment="Left" Height="30" Margin="77,263,0,0" TextWrapping="Wrap" Text="{Binding F1LeftConstraint}" VerticalAlignment="Top" Width="58" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
-            <TextBox HorizontalAlignment="Right" Height="30" Margin="0,164,185,0" TextWrapping="Wrap" Text="{Binding F2Formula}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}"/>
+            <TextBox IsReadOnly="True" HorizontalAlignment="Right" Height="30" Margin="0,164,185,0" TextWrapping="Wrap" Text="{Binding F2Formula}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}"/>
             <Label Content="Domain" Height="49"  Margin="124,219,114,133"  Style="{DynamicResource Label}"/>
             <Label Content="F1" Height="49"  Margin="10,259,279,93"  Style="{DynamicResource Label}"/>
             <Label Content="F2" Height="49"  Margin="10,321,279,31" Style="{DynamicResource Label}"/>
@@ -62,13 +62,13 @@
             <Button x:Name="Reset" Content="Reset" HorizontalAlignment="Left" Height="40" Margin="195,197,0,0" Grid.Row="1" VerticalAlignment="Top" Width="122" Style="{DynamicResource BlackButton}" Click="Reset_Click" />
             <Button x:Name="DValues" Content="Default values" HorizontalAlignment="Left" Height="40" Margin="44,161,0,0" Grid.Row="1" VerticalAlignment="Top" Width="122" Style="{DynamicResource BlackButton}" Click="DValues_Click"/>
             <Button x:Name="SaveToFile" Content="Save to File" HorizontalAlignment="Left" Height="40" Margin="44,243,0,0" Grid.Row="1" VerticalAlignment="Top" Width="122" IsEnabled="False" Style="{DynamicResource BlackButton}" Click="SaveToFile_Click" Grid.RowSpan="2"/>
-            <TextBox HorizontalAlignment="Left"  Height="30" Margin="77,116,0,0"  Text="{Binding F1Formula}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}"/>
+            <TextBox IsReadOnly="True" HorizontalAlignment="Left"  Height="30" Margin="77,116,0,0"  Text="{Binding F1Formula}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}"/>
             <TextBox HorizontalAlignment="Left" Margin="242,325,0,46" TextWrapping="Wrap" Text="{Binding F2RightConstraint}" Width="58" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
             <TextBox HorizontalAlignment="Left" Height="30" Margin="77,325,0,0" TextWrapping="Wrap" Text="{Binding F2LeftConstraint}" VerticalAlignment="Top" Width="58" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
             <TextBox Height="30" Margin="242,263,51,0" TextWrapping="Wrap" Text="{Binding F1RightConstraint}" VerticalAlignment="Top" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
             <Label Content=" ≤  x1  ≤"  Margin="140,257,114,95"  Style="{DynamicResource Label}"/>
             <Label Content=" ≤  x2  ≤"  Margin="140,319,114,33"  Style="{DynamicResource Label}"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="107,15,0,0" TextWrapping="Wrap" Text="{Binding Popsize}" VerticalAlignment="Top" Width="59" Grid.Row="1" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
+            <TextBox HorizontalAlignment="Left" Height="30" Margin="107,15,0,0" TextWrapping="Wrap" Text="{Binding Popsize, Mode=TwoWay}" VerticalAlignment="Top" Width="59" Grid.Row="1" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
             <Label Content="Plausibility of mutation:" Height="49"  Margin="10,58,81,151" Grid.Row="1"  Style="{DynamicResource Label}"/>
             <Label Content="Plausibility of crossing:" Height="49"  Margin="10,107,81,102" Grid.Row="1"  Style="{DynamicResource Label}"/>
             <TextBox HorizontalAlignment="Left" Height="30" Margin="273,112,0,0" TextWrapping="Wrap" Text="{Binding PlausOfMutation}" VerticalAlignment="Top" Width="58" Grid.Row="1" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
