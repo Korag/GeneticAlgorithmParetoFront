@@ -61,8 +61,9 @@ namespace EvolutionaryAlgorithmApp
             // Binding
             parameters = new Parameters();
             this.DataContext = parameters;
+            DefaultValue();
 
-  
+
 
             // testy 
             parameters.ListOfPoints.Add(new ObservablePoint(r.NextDouble() * 10, r.NextDouble() * 10));
@@ -83,7 +84,7 @@ namespace EvolutionaryAlgorithmApp
             while (true)
             {
                 // czas na obserwacje popsize'a i wykresu wartosci funkcji
-                Thread.Sleep(parameters.SleepTime);
+                Thread.Sleep((int)parameters.SleepTime);
 
                 // wszystkie operacje wykonujemy na tablicy znajdujacej sie w Parameters   public double[][][] Population; // [2][popsize][popsize]
 
@@ -173,9 +174,27 @@ namespace EvolutionaryAlgorithmApp
             // zatrzymujemy w dowolnym momencie (po danej skonczonej iteracji) dzialanie algorytmu
         }
 
+        // tutaj po prostu ustawiamy wszystkie wartosci w parameters i potem sa one wyswietlane na ekranie
         private void DValues_Click(object sender, RoutedEventArgs e)
         {
-            // tutaj po prostu ustawiamy wszystkie wartosci w parameters i potem sa one wyswietlane na ekranie
+            DefaultValue();
+        }
+
+        private void DefaultValue()
+        {
+            parameters.F1Formula = "Evol";
+            parameters.F2Formula = "Morons";
+            parameters.F1LeftConstraint = 1;
+            parameters.F1RightConstraint = 1;
+            parameters.F2LeftConstraint = 1;
+            parameters.F2RightConstraint = 1;
+            parameters.Popsize = 1;
+            parameters.PlausOfMutation = 1;
+            parameters.PlausOfCrossing = 1;
+            parameters.Minimum = "Wojrog";
+            parameters.SleepTime = 1;
+            parameters.IterationLimit = 1;
+            parameters.IterationNumber = 0;
         }
 
         private void SaveToFile_Click(object sender, RoutedEventArgs e)
@@ -187,9 +206,12 @@ namespace EvolutionaryAlgorithmApp
             
         }
 
+        // tutaj po prostu czyscimy wszystkie wartosci z parameters na puste 
         private void Reset_Click(object sender, RoutedEventArgs e)
         {
-            // tutaj po prostu czyscimy wszystkie wartosci z parameters na puste 
+            this.parameters = null;
+            parameters = new Parameters();
+            this.DataContext = parameters;
         }
     }
 }
