@@ -71,6 +71,7 @@ namespace EvolutionaryAlgorithmApp
             // Binding
             _parameters = new Parameters();
             this.DataContext = _parameters;
+            DefaultValue();
 
             ReinitializeVariables();
 
@@ -199,10 +200,30 @@ namespace EvolutionaryAlgorithmApp
             // zatrzymujemy w dowolnym momencie (po danej skonczonej iteracji) dzialanie algorytmu
         }
 
+ 
+        // tutaj po prostu ustawiamy wszystkie wartosci w parameters i potem sa one wyswietlane na ekranie
         private void DValues_Click(object sender, RoutedEventArgs e)
         {
-            // tutaj po prostu ustawiamy wszystkie wartosci w parameters i potem sa one wyswietlane na ekranie
+           DefaultValue();
         }
+
+        private void DefaultValue()
+         {
+             _parameters.F1Formula = "Evol";
+             _parameters.F2Formula = "Morons";
+             _parameters.F1LeftConstraint = 1;
+             _parameters.F1RightConstraint = 1;
+             _parameters.F2LeftConstraint = 1;
+             _parameters.F2RightConstraint = 1;
+             _parameters.Popsize = 1;
+             _parameters.PlausOfMutation = 1;
+             _parameters.PlausOfCrossing = 1;
+             _parameters.Minimum = "Wojrog";
+             _parameters.SleepTime = 1;
+             _parameters.IterationLimit = 1;
+             _parameters.IterationNumber = 0;
+         }
+
 
         private void SaveToFile_Click(object sender, RoutedEventArgs e)
         {
@@ -213,9 +234,12 @@ namespace EvolutionaryAlgorithmApp
             
         }
 
+        // tutaj po prostu czyscimy wszystkie wartosci z parameters na puste 
         private void Reset_Click(object sender, RoutedEventArgs e)
         {
-            // tutaj po prostu czyscimy wszystkie wartosci z parameters na puste 
+            this._parameters = null;
+            _parameters = new Parameters();
+            this.DataContext = _parameters;
         }
     }
 }
