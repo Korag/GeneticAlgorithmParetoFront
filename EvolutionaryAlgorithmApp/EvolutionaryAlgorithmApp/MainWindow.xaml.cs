@@ -37,12 +37,12 @@ namespace EvolutionaryAlgorithmApp
         private Parameters _parameters;
         Random r = new Random();
 
-        private int Pop_Size;
-        private double F1LeftConstraint;
-        private double F1RightConstraint;
-        private double F2LeftConstraint;
-        private double F2RightConstraint;
-        private double Sleeper;
+        private int? Pop_Size;
+        private double? F1LeftConstraint;
+        private double? F1RightConstraint;
+        private double? F2LeftConstraint;
+        private double? F2RightConstraint;
+        private double? Sleeper;
 
 
 
@@ -85,8 +85,8 @@ namespace EvolutionaryAlgorithmApp
             var trandom = new TRandom();
             for (int i = 0; i < Pop_Size; i++)
             {
-                Thread.Sleep((int)(Sleeper * 1000));
-                _parameters.ListOfPoints.Add(new ObservablePoint(trandom.NextDouble(F1LeftConstraint,F1RightConstraint), trandom.NextDouble(F2LeftConstraint, F2RightConstraint)));
+                Thread.Sleep((int)(Sleeper * 100));
+                _parameters.ListOfPoints.Add(new ObservablePoint(trandom.NextDouble((double)F1LeftConstraint, (double)F1RightConstraint), trandom.NextDouble((double)F2LeftConstraint, (double)F2RightConstraint)));
                 wykres.EditSeriesCollection(_parameters.ListOfPoints);
             }
 
@@ -117,7 +117,6 @@ namespace EvolutionaryAlgorithmApp
             while (true)
             {
                 // czas na obserwacje popsize'a i wykresu wartosci funkcji
-                Thread.Sleep(_parameters.SleepTime);
 
                 // wszystkie operacje wykonujemy na tablicy znajdujacej sie w Parameters   public double[][][] Population; // [2][popsize][popsize]
 
@@ -209,8 +208,8 @@ namespace EvolutionaryAlgorithmApp
 
         private void DefaultValue()
          {
-             _parameters.F1Formula = "Evol";
-             _parameters.F2Formula = "Morons";
+             _parameters.F1Formula = "Fun1";
+             _parameters.F2Formula = "Fun2";
              _parameters.F1LeftConstraint = 1;
              _parameters.F1RightConstraint = 1;
              _parameters.F2LeftConstraint = 1;
@@ -218,7 +217,7 @@ namespace EvolutionaryAlgorithmApp
              _parameters.Popsize = 1;
              _parameters.PlausOfMutation = 1;
              _parameters.PlausOfCrossing = 1;
-             _parameters.Minimum = "Wojrog";
+             _parameters.Minimum = "MinValue";
              _parameters.SleepTime = 1;
              _parameters.IterationLimit = 1;
              _parameters.IterationNumber = 0;

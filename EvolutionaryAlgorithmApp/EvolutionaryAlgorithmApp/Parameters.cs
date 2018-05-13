@@ -14,7 +14,7 @@ namespace EvolutionaryAlgorithmApp
     public class Parameters : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        public string Name { get; set; } = "dsfsdf";
+        public string Name { get; set; }
         public ChartValues<ObservablePoint> ListOfPoints { get; set; } = new ChartValues<ObservablePoint>();
 
 

@@ -46,10 +46,10 @@
 
             <!--Funkcje-->
             <Label Content="F1" Height="49"  Margin="10,110,279,242" Style="{DynamicResource Label}"/>
-            <TextBox HorizontalAlignment="Left"  Height="30" Margin="77,116,0,0"  Text="{Binding F1Formula}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}"/>
+            <TextBox IsReadOnly="True" HorizontalAlignment="Left"  Height="30" Margin="77,116,0,0"  Text="{Binding F1Formula}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}"/>
 
             <Label Content="F2" Height="49"  Margin="10,159,279,193" Style="{DynamicResource Label}"/>
-            <TextBox HorizontalAlignment="Right" Height="30" Margin="0,164,185,0" TextWrapping="Wrap" Text="{Binding F2Formula}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}"/>
+            <TextBox IsReadOnly="True" HorizontalAlignment="Right" Height="30" Margin="0,164,185,0" TextWrapping="Wrap" Text="{Binding F2Formula}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}"/>
 
             <!--Ograniczenia funkcji (dziedziny)-->
             <Label Content="Domain" Height="49"  Margin="124,219,114,133"  Style="{DynamicResource Label}"/>
@@ -88,7 +88,7 @@
 
             <!--Minimum-->
             <Label Content="Minimum:" HorizontalAlignment="Left" Height="49" Margin="344,16,0,0" VerticalAlignment="Top" Width="117" Grid.Column="2"  Style="{DynamicResource Label}" />
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="466,21,0,0" TextWrapping="Wrap" Text="{Binding Minimum}" VerticalAlignment="Top" Width="96" Style="{DynamicResource BlueTextBox}" Grid.Column="2" />
+            <TextBox IsReadOnly="True" HorizontalAlignment="Left" Height="30" Margin="466,21,0,0" TextWrapping="Wrap" Text="{Binding Minimum}" VerticalAlignment="Top" Width="96" Style="{DynamicResource BlueTextBox}" Grid.Column="2" />
 
             <!--Controlki do wykresow-->
             
