@@ -9,6 +9,8 @@
         mc:Ignorable="d"
         Icon="Images\favicon.png"
         Title="Evolutionary Morons" Height="720" Width="1280" MinHeight="360" MinWidth="640">
+   
+    <!--Dostosowanie okna oraz ustawienia vievboxa oraz grida wewnatrz niego-->
     <Window.Background>
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
             <GradientStop Color="#FF4045A2"/>
@@ -33,48 +35,76 @@
                 <ColumnDefinition Width="373*"/>
                 <ColumnDefinition Width="572*"/>
             </Grid.ColumnDefinitions>
-            <UserControls:CartesianChartUserCtrl x:Name="wykres" HorizontalAlignment="Left" Height="340" Margin="10,51,0,0" VerticalAlignment="Top" Width="353" Grid.Column="1"/>
-            <UserControls:CartesianChartUserCtrl HorizontalAlignment="Left" Height="340" Margin="10,51,0,0" VerticalAlignment="Top" Width="552" Grid.Column="2"/>
-            <UserControls:CartesianChartUserCtrl HorizontalAlignment="Left" Height="212" Margin="10,46,0,0" VerticalAlignment="Top" Width="925" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"/>
-            <Label Content="© Vertisio 2018" Height="23" Margin="0,2,545,0" Grid.Row="2" VerticalAlignment="Top" Foreground="Black" Grid.Column="1" Grid.ColumnSpan="2" FontWeight="Bold" FontFamily="Bernard MT Condensed" HorizontalAlignment="Right" Width="157"/>
-            <Label Grid.ColumnSpan="2" Content="© Łukasz Czepielik, Kamil Haręża, Konrad Korzonkiewicz, Bartosz Wróbel, Wojciech Rogowski" HorizontalAlignment="Left" Height="32" Margin="75,18,0,0" Grid.Row="2" VerticalAlignment="Top" Width="515" Foreground="#FFA21A1A" Grid.Column="1" FontFamily="Myanmar Text" FontStyle="Italic"/>
-            <Label Content="Domain" HorizontalAlignment="Left" Height="49" Margin="10,16,0,0" VerticalAlignment="Top" Width="115" Grid.Column="1" Style="{DynamicResource Label}"/>
-            <Label Content="Pareto Front" HorizontalAlignment="Left" Height="49" Margin="10,16,0,0" VerticalAlignment="Top" Width="150"  Grid.Column="2"  Style="{DynamicResource Label}"/>
-            <Label Content="Minimum:" HorizontalAlignment="Left" Height="49" Margin="344,16,0,0" VerticalAlignment="Top" Width="117" Grid.Column="2"  Style="{DynamicResource Label}" />
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="466,21,0,0" TextWrapping="Wrap" Text="{Binding Minimum}" VerticalAlignment="Top" Width="96" Style="{DynamicResource BlueTextBox}" Grid.Column="2" />
-            <Label Content="Values of functions in iteration:" HorizontalAlignment="Left" Height="49" VerticalAlignment="Top" Width="349"  Grid.Column="1" Grid.Row="1" Style="{DynamicResource Label}" Margin="10,9,0,0"/>
+
+            <!--Licznik iteracji-->
             <Label Content="Iterations" Height="49" VerticalAlignment="Top" Margin="61,16,177,0" Style="{DynamicResource Label}"/>
+            <Label Content="{Binding IterationNumber}"  Margin="77,51,190,309" Style="{DynamicResource Label}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+
+            <!--Limit iteracji-->
             <Label Content="Limit" Height="49" VerticalAlignment="Top" Margin="237,16,39,0" Style="{DynamicResource Label}"/>
-            <Label Content="0"   Margin="77,51,190,309" Style="{DynamicResource Label}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            <TextBox HorizontalAlignment="Left"  Height="30" Margin="228,57,0,0" Text="{Binding IterationLimit}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center" VerticalContentAlignment="Top"/>
+
+            <!--Funkcje-->
             <Label Content="F1" Height="49"  Margin="10,110,279,242" Style="{DynamicResource Label}"/>
+            <TextBox HorizontalAlignment="Left"  Height="30" Margin="77,116,0,0"  Text="{Binding F1Formula}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}"/>
+
             <Label Content="F2" Height="49"  Margin="10,159,279,193" Style="{DynamicResource Label}"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="77,263,0,0" TextWrapping="Wrap" Text="{Binding F1LeftConstraint}" VerticalAlignment="Top" Width="58" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
-            <TextBox IsReadOnly="True" HorizontalAlignment="Right" Height="30" Margin="0,164,185,0" TextWrapping="Wrap" Text="{Binding F2Formula}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}"/>
+            <TextBox HorizontalAlignment="Right" Height="30" Margin="0,164,185,0" TextWrapping="Wrap" Text="{Binding F2Formula}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}"/>
+
+            <!--Ograniczenia funkcji (dziedziny)-->
             <Label Content="Domain" Height="49"  Margin="124,219,114,133"  Style="{DynamicResource Label}"/>
+            
+            <Label Content=" ≤  x1  ≤"  Margin="140,257,114,95"  Style="{DynamicResource Label}"/>
             <Label Content="F1" Height="49"  Margin="10,259,279,93"  Style="{DynamicResource Label}"/>
+            <TextBox HorizontalAlignment="Left" Height="30" Margin="77,263,0,0" TextWrapping="Wrap" Text="{Binding F1LeftConstraint}" VerticalAlignment="Top" Width="58" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
+            <TextBox Height="30" Margin="242,263,51,0" TextWrapping="Wrap" Text="{Binding F1RightConstraint}" VerticalAlignment="Top" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
+
+            <Label Content=" ≤  x2  ≤"  Margin="140,319,114,33"  Style="{DynamicResource Label}"/>
             <Label Content="F2" Height="49"  Margin="10,321,279,31" Style="{DynamicResource Label}"/>
+            <TextBox HorizontalAlignment="Left" Height="30" Margin="77,325,0,0" TextWrapping="Wrap" Text="{Binding F2LeftConstraint}" VerticalAlignment="Top" Width="58" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
+            <TextBox HorizontalAlignment="Left" Margin="242,325,0,46" TextWrapping="Wrap" Text="{Binding F2RightConstraint}" Width="58" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
+
+
+            <!--Popsize oraz sleep-->
             <Label Content="Popsize:" Height="49" Margin="10,10,244,199" Grid.Row="1"  Style="{DynamicResource Label}"/>
+            <TextBox HorizontalAlignment="Left" Height="30" Margin="107,15,0,0" TextWrapping="Wrap" Text="{Binding Popsize}" VerticalAlignment="Top" Width="59" Grid.Row="1" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
+
             <Label Content="Sleep:" Height="49" Margin="195,9,59,200" Grid.Row="1"  Style="{DynamicResource Label}"/>
             <TextBox HorizontalAlignment="Left" Height="30" Margin="273,15,0,0" TextWrapping="Wrap" Text="{Binding SleepTime}" VerticalAlignment="Top" Width="58" Grid.Row="1" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
+
+            <!--Prawdopodobieństwa-->
+            <Label Content="Plausibility of mutation:" Height="49"  Margin="10,58,81,151" Grid.Row="1"  Style="{DynamicResource Label}"/>
+            <TextBox HorizontalAlignment="Left" Height="30" Margin="273,65,0,0" TextWrapping="Wrap" Text="{Binding PlausOfMutation }" VerticalAlignment="Top" Width="58" Grid.Row="1" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center" />
+
+            <Label Content="Plausibility of crossing:" Height="49"  Margin="10,107,81,102" Grid.Row="1"  Style="{DynamicResource Label}"/>
+            <TextBox HorizontalAlignment="Left" Height="30" Margin="273,112,0,0" TextWrapping="Wrap" Text="{Binding PlausOfCrossing}" VerticalAlignment="Top" Width="58" Grid.Row="1" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
+
+            <!--Buttony-->
             <Button x:Name="Start" Content="Start" HorizontalAlignment="Left" Height="40" Margin="209,110,0,0" VerticalAlignment="Top" Width="122" Style="{DynamicResource BlueButton}" Click="Start_Click" />
             <Button x:Name="Stop" Content="Stop" HorizontalAlignment="Left" Height="40" Margin="209,159,0,0" VerticalAlignment="Top" Width="122" Style="{DynamicResource BlueButton}" Click="Stop_Click" />
-            <TextBox HorizontalAlignment="Left"  Height="30" Margin="228,57,0,0" Text="{Binding IterationLimit}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center" VerticalContentAlignment="Top"/>
             <Button x:Name="Reset" Content="Reset" HorizontalAlignment="Left" Height="40" Margin="195,197,0,0" Grid.Row="1" VerticalAlignment="Top" Width="122" Style="{DynamicResource BlackButton}" Click="Reset_Click" />
             <Button x:Name="DValues" Content="Default values" HorizontalAlignment="Left" Height="40" Margin="44,161,0,0" Grid.Row="1" VerticalAlignment="Top" Width="122" Style="{DynamicResource BlackButton}" Click="DValues_Click"/>
             <Button x:Name="SaveToFile" Content="Save to File" HorizontalAlignment="Left" Height="40" Margin="44,243,0,0" Grid.Row="1" VerticalAlignment="Top" Width="122" IsEnabled="False" Style="{DynamicResource BlackButton}" Click="SaveToFile_Click" Grid.RowSpan="2"/>
-            <TextBox IsReadOnly="True" HorizontalAlignment="Left"  Height="30" Margin="77,116,0,0"  Text="{Binding F1Formula}" VerticalAlignment="Top" Width="89" Style="{DynamicResource BlueTextBox}"/>
-            <TextBox HorizontalAlignment="Left" Margin="242,325,0,46" TextWrapping="Wrap" Text="{Binding F2RightConstraint}" Width="58" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="77,325,0,0" TextWrapping="Wrap" Text="{Binding F2LeftConstraint}" VerticalAlignment="Top" Width="58" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
-            <TextBox Height="30" Margin="242,263,51,0" TextWrapping="Wrap" Text="{Binding F1RightConstraint}" VerticalAlignment="Top" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
-            <Label Content=" ≤  x1  ≤"  Margin="140,257,114,95"  Style="{DynamicResource Label}"/>
-            <Label Content=" ≤  x2  ≤"  Margin="140,319,114,33"  Style="{DynamicResource Label}"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="107,15,0,0" TextWrapping="Wrap" Text="{Binding Popsize, Mode=TwoWay}" VerticalAlignment="Top" Width="59" Grid.Row="1" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
-            <Label Content="Plausibility of mutation:" Height="49"  Margin="10,58,81,151" Grid.Row="1"  Style="{DynamicResource Label}"/>
-            <Label Content="Plausibility of crossing:" Height="49"  Margin="10,107,81,102" Grid.Row="1"  Style="{DynamicResource Label}"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="273,112,0,0" TextWrapping="Wrap" Text="{Binding PlausOfMutation}" VerticalAlignment="Top" Width="58" Grid.Row="1" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="273,65,0,0" TextWrapping="Wrap" Text="{Binding PlausOfCrossover}" VerticalAlignment="Top" Width="58" Grid.Row="1" Style="{DynamicResource BlueTextBox}" HorizontalContentAlignment="Center" />
 
+            <!--Minimum-->
+            <Label Content="Minimum:" HorizontalAlignment="Left" Height="49" Margin="344,16,0,0" VerticalAlignment="Top" Width="117" Grid.Column="2"  Style="{DynamicResource Label}" />
+            <TextBox HorizontalAlignment="Left" Height="30" Margin="466,21,0,0" TextWrapping="Wrap" Text="{Binding Minimum}" VerticalAlignment="Top" Width="96" Style="{DynamicResource BlueTextBox}" Grid.Column="2" />
 
+            <!--Controlki do wykresow-->
+            
+            <Label Content="Domain" HorizontalAlignment="Left" Height="49" Margin="10,16,0,0" VerticalAlignment="Top" Width="115" Grid.Column="1" Style="{DynamicResource Label}"/>
+            <UserControls:CartesianChartUserCtrl x:Name="wykres" HorizontalAlignment="Left" Height="340" Margin="10,51,0,0" VerticalAlignment="Top" Width="353" Grid.Column="1"/>
+
+            <Label Content="Pareto Front" HorizontalAlignment="Left" Height="49" Margin="10,16,0,0" VerticalAlignment="Top" Width="150"  Grid.Column="2"  Style="{DynamicResource Label}"/>
+            <UserControls:CartesianChartUserCtrl HorizontalAlignment="Left" Height="340" Margin="10,51,0,0" VerticalAlignment="Top" Width="552" Grid.Column="2"/>
+
+            <Label Content="Values of functions in iteration:" HorizontalAlignment="Left" Height="49" VerticalAlignment="Top" Width="349"  Grid.Column="1" Grid.Row="1" Style="{DynamicResource Label}" Margin="10,9,0,0"/>
+            <UserControls:CartesianChartUserCtrl HorizontalAlignment="Left" Height="212" Margin="10,46,0,0" VerticalAlignment="Top" Width="925" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"/>
+
+            <!--Stopka-->
+            <Label Content="© Vertisio 2018" Height="23" Margin="0,2,545,0" Grid.Row="2" VerticalAlignment="Top" Foreground="Black" Grid.Column="1" Grid.ColumnSpan="2" FontWeight="Bold" FontFamily="Bernard MT Condensed" HorizontalAlignment="Right" Width="157"/>
+            <Label Grid.ColumnSpan="2" Content="© Łukasz Czepielik, Kamil Haręża, Konrad Korzonkiewicz, Bartosz Wróbel, Wojciech Rogowski" HorizontalAlignment="Left" Height="32" Margin="75,18,0,0" Grid.Row="2" VerticalAlignment="Top" Width="515" Foreground="#FFA21A1A" Grid.Column="1" FontFamily="Myanmar Text" FontStyle="Italic"/>
+            
         </Grid>
     </Viewbox>
 </Window>
