@@ -37,12 +37,12 @@ namespace EvolutionaryAlgorithmApp
         private Parameters _parameters;
         Random r = new Random();
 
-        private int? Pop_Size;
-        private double? F1LeftConstraint;
-        private double? F1RightConstraint;
-        private double? F2LeftConstraint;
-        private double? F2RightConstraint;
-        private double? Sleeper;
+        private int Pop_Size;
+        private double F1LeftConstraint;
+        private double F1RightConstraint;
+        private double F2LeftConstraint;
+        private double F2RightConstraint;
+        private double Sleeper;
 
 
 
@@ -86,8 +86,8 @@ namespace EvolutionaryAlgorithmApp
             for (int i = 0; i < Pop_Size; i++)
             {
                 Thread.Sleep((int)(Sleeper * 100));
-                _parameters.ListOfPoints.Add(new ObservablePoint(trandom.NextDouble((double)F1LeftConstraint, (double)F1RightConstraint), 
-                                                                trandom.NextDouble((double)F2LeftConstraint, (double)F2RightConstraint)
+                _parameters.ListOfPoints.Add(new ObservablePoint(trandom.NextDouble(F1LeftConstraint, F1RightConstraint), 
+                                                                trandom.NextDouble(F2LeftConstraint, F2RightConstraint)
                                                                 ));
                 wykres.EditSeriesCollection(_parameters.ListOfPoints);
             }
@@ -202,30 +202,44 @@ namespace EvolutionaryAlgorithmApp
             // zatrzymujemy w dowolnym momencie (po danej skonczonej iteracji) dzialanie algorytmu
         }
 
- 
+
         // tutaj po prostu ustawiamy wszystkie wartosci w parameters i potem sa one wyswietlane na ekranie
-        private void DValues_Click(object sender, RoutedEventArgs e)
-        {
-           DefaultValue();
-        }
+
+
+        #region Stary reset
+
+        //private void DValues_Click(object sender, RoutedEventArgs e)
+        //{
+        //   DefaultValue();
+        //}
+
+        //private void Reset_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this._parameters = null;
+        //    ConnectionHelper.ParametersObject = new Parameters();
+        //    _parameters = ConnectionHelper.ParametersObject;
+        //    this.DataContext = _parameters;
+        //}
+
+        #endregion
 
         private void DefaultValue()
-         {
-             _parameters.F1Formula = "Fun1";
-             _parameters.F2Formula = "Fun2";
-             _parameters.F1LeftConstraint = 1;
-             _parameters.F1RightConstraint = 1;
-             _parameters.F2LeftConstraint = 1;
-             _parameters.F2RightConstraint = 1;
-             _parameters.Popsize = 1;
-             _parameters.PlausOfMutation = 1;
-             _parameters.PlausOfCrossing = 1;
-             _parameters.Minimum = "MinValue";
-             _parameters.SleepTime = 1;
-             _parameters.IterationLimit = 1;
-             _parameters.IterationNumber = 0;
-         }
-
+        {
+            _parameters.F1Formula = "x1";
+            _parameters.F2Formula = "(1+x2)/x1";
+            _parameters.F1LeftConstraint = 0.1;
+            _parameters.F1RightConstraint = 1;
+            _parameters.F2LeftConstraint = 0;
+            _parameters.F2RightConstraint = 5;
+            _parameters.Popsize = 200;
+            _parameters.PlausOfMutation = 0.2;
+            _parameters.PlausOfCrossing = 0.6;
+            _parameters.Minimum = "EV MORONS";
+            _parameters.SleepTime = 1;
+            _parameters.IterationLimit = 200;
+            _parameters.IterationNumber = 0;
+        }
+    
 
         private void SaveToFile_Click(object sender, RoutedEventArgs e)
         {
@@ -239,10 +253,7 @@ namespace EvolutionaryAlgorithmApp
         // tutaj po prostu czyscimy wszystkie wartosci z parameters na puste 
         private void Reset_Click(object sender, RoutedEventArgs e)
         {
-            this._parameters = null;
-            ConnectionHelper.ParametersObject = new Parameters();
-           _parameters = ConnectionHelper.ParametersObject;
-            this.DataContext = _parameters;
+            DefaultValue();
         }
     }
 }
