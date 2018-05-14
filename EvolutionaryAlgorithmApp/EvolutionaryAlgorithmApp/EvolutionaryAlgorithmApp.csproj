@@ -72,8 +72,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ConnectionHelper.cs" />
     <Compile Include="UserControls\CartesianChartUserCtrl.xaml.cs">
       <DependentUpon>CartesianChartUserCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ParetoChartUserControl.xaml.cs">
+      <DependentUpon>ParetoChartUserControl.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -92,6 +96,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\CartesianChartUserCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ParetoChartUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -96,7 +96,7 @@
             <UserControls:CartesianChartUserCtrl x:Name="wykres" HorizontalAlignment="Left" Height="340" Margin="10,51,0,0" VerticalAlignment="Top" Width="353" Grid.Column="1"/>
 
             <Label Content="Pareto Front" HorizontalAlignment="Left" Height="49" Margin="10,16,0,0" VerticalAlignment="Top" Width="150"  Grid.Column="2"  Style="{DynamicResource Label}"/>
-            <UserControls:CartesianChartUserCtrl HorizontalAlignment="Left" Height="340" Margin="10,51,0,0" VerticalAlignment="Top" Width="552" Grid.Column="2"/>
+            <UserControls:ParetoChartUserControl x:Name="ParetoChart" HorizontalAlignment="Left" Height="340" Margin="10,51,0,0" VerticalAlignment="Top" Width="552" Grid.Column="2"/>
 
             <Label Content="Values of functions in iteration:" HorizontalAlignment="Left" Height="49" VerticalAlignment="Top" Width="349"  Grid.Column="1" Grid.Row="1" Style="{DynamicResource Label}" Margin="10,9,0,0"/>
             <UserControls:CartesianChartUserCtrl HorizontalAlignment="Left" Height="212" Margin="10,46,0,0" VerticalAlignment="Top" Width="925" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"/>

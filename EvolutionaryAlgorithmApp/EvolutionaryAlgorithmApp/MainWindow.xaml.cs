@@ -69,10 +69,10 @@ namespace EvolutionaryAlgorithmApp
             worker.RunWorkerCompleted += worker_RunWorkerCompleted;
 
             // Binding
-            _parameters = new Parameters();
+            _parameters = ConnectionHelper.ParametersObject;
             this.DataContext = _parameters;
             DefaultValue();
-
+            
             ReinitializeVariables();
 
         }
@@ -86,7 +86,9 @@ namespace EvolutionaryAlgorithmApp
             for (int i = 0; i < Pop_Size; i++)
             {
                 Thread.Sleep((int)(Sleeper * 100));
-                _parameters.ListOfPoints.Add(new ObservablePoint(trandom.NextDouble((double)F1LeftConstraint, (double)F1RightConstraint), trandom.NextDouble((double)F2LeftConstraint, (double)F2RightConstraint)));
+                _parameters.ListOfPoints.Add(new ObservablePoint(trandom.NextDouble((double)F1LeftConstraint, (double)F1RightConstraint), 
+                                                                trandom.NextDouble((double)F2LeftConstraint, (double)F2RightConstraint)
+                                                                ));
                 wykres.EditSeriesCollection(_parameters.ListOfPoints);
             }
 
@@ -185,6 +187,7 @@ namespace EvolutionaryAlgorithmApp
         private void Start_Click(object sender, RoutedEventArgs e)
         {
             Start.IsEnabled = false;
+            ParetoChart.MakeParetoFunctions();
             ReinitializeVariables();
             worker.RunWorkerAsync();
             
@@ -237,7 +240,8 @@ namespace EvolutionaryAlgorithmApp
         private void Reset_Click(object sender, RoutedEventArgs e)
         {
             this._parameters = null;
-            _parameters = new Parameters();
+            ConnectionHelper.ParametersObject = new Parameters();
+           _parameters = ConnectionHelper.ParametersObject;
             this.DataContext = _parameters;
         }
     }
