@@ -35,7 +35,7 @@ namespace EvolutionaryAlgorithmApp
     {
         private readonly BackgroundWorker worker = new BackgroundWorker();
         private Parameters _parameters;
-        Random r = new Random();
+        TRandom trandom = new TRandom();
 
         private int Pop_Size;
         private double F1LeftConstraint;
@@ -43,6 +43,9 @@ namespace EvolutionaryAlgorithmApp
         private double F2LeftConstraint;
         private double F2RightConstraint;
         private double Sleeper;
+        private double[][] Population;
+        private double[][] PopulationAfterSelection;
+        private double[][] PopulationAfterCrossing;
 
 
 
@@ -82,7 +85,6 @@ namespace EvolutionaryAlgorithmApp
 
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            var trandom = new TRandom();
             for (int i = 0; i < Pop_Size; i++)
             {
                 Thread.Sleep((int)(Sleeper * 100));
@@ -104,6 +106,10 @@ namespace EvolutionaryAlgorithmApp
             F2LeftConstraint = _parameters.F2LeftConstraint;
             F2RightConstraint = _parameters.F2RightConstraint;
             Sleeper = _parameters.SleepTime;
+            Population = _parameters.Population;
+            PopulationAfterSelection = _parameters.PopulationAfterSelection;
+            PopulationAfterCrossing = _parameters.PopulationAfterCrossing;
+            Population = _parameters.Population;
             _parameters.ListOfPoints = new LiveCharts.ChartValues<ObservablePoint>();
         }
 
@@ -114,6 +120,13 @@ namespace EvolutionaryAlgorithmApp
             // w momencie gdy nacisnie sie przycisk stop
             // iteracje maja timer po to aby mozna bylo zauwazyc na interfejsie ksztaltowanie punktow
             // dzieki wykorzystaniu async await workerow interfejs graficzny nie bedzie blokowany
+            InitializePopulation(ref Population, Pop_Size);
+            FillRandomValues(ref Population);
+
+            InitializePopulation(ref PopulationAfterSelection, Pop_Size / 2);
+
+            InitializePopulation(ref PopulationAfterCrossing, Pop_Size / 4);
+
 
             // teraz ta petla ma byc przerwana kiedy nacisniemy stop
             while (true)
@@ -122,6 +135,7 @@ namespace EvolutionaryAlgorithmApp
 
                 // wszystkie operacje wykonujemy na tablicy znajdujacej sie w Parameters   public double[][][] Population; // [2][popsize][popsize]
 
+                FillRandomValues(ref Population);
 
                 // operacja selekcji
 
@@ -130,7 +144,9 @@ namespace EvolutionaryAlgorithmApp
                 // selekcja turniejowa --> losujemy 2 punkty z populacji i wygrywa lepszy (o mniejszej wartosci), 
                 // dzielimy popsize na 2 rowne zbiory i jeden zbior jest porownywany wzgledem f1 a drugi wzgledem f2
 
-                // nie wiem co dalej... 
+                //PopulationAfterSelection = Selection(Population);
+
+              . 
 
                 // selekcja ruletkowa --> obliczamy fitness, jaki to jest procent z calosci dla danego osobnika, obliczamy dystrybuante,
                 // generujemy liczby losowe i szeregujemy okreslajac ktore elementy maja przetrwac
@@ -139,6 +155,7 @@ namespace EvolutionaryAlgorithmApp
 
 
                 // operacja mutacji
+                
 
                 // losujemy ktore punkty zostana poddane mutacji (sprawdzamy wszystkie pod wzgledem prawdopodobienstwa) (prawdopodobienstwo mutacji dla kazdego osobnika)
                 // jezeli wylosowano osobnika to losujemy kat oraz dlugosc wektora
@@ -152,6 +169,8 @@ namespace EvolutionaryAlgorithmApp
                 // to jest chyba najtrudniejsza operacja, duzo pierdolenia z przeksztalceniami
                 // ogolnie to staramy sie tak skrzyzowac aby np calkowicie odbic jeden punkt 
                 // do dyskusji jak to robimy
+                
+                PopulationAfterCrossing = Crossing(PopulationAfterSelection);
 
                 // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
 
@@ -168,6 +187,33 @@ namespace EvolutionaryAlgorithmApp
             }
         }
 
+        private void FillRandomValues(ref double[][] Population)
+        {
+            for (int i = 0; i < Population.Length; i++)
+            {
+                for (int j = 0; j < Population[i].Length; j++)
+                {
+                    if (Population[i][0] == 0 && Population[i][1] == 0 && j == 0)
+                    {
+                        Population[i][j] = trandom.NextDouble(F1LeftConstraint, F1RightConstraint);
+                    }
+                    else if (Population[i][0] == 0 && Population[i][1] == 0 && j == 1)
+                    {
+                        Population[i][j] = trandom.NextDouble(F2LeftConstraint, F2RightConstraint);
+                    }
+                }
+            }
+        }
+
+        private void InitializePopulation(ref double[][] Population, int popsize)
+        {
+            Population = new double[popsize][];
+            for (int i = 0; i < Population.Length; i++)
+            {
+                Population[i] = new double[2];
+            }
+        }
+
         private void Selection()
         {
 
@@ -178,10 +224,87 @@ namespace EvolutionaryAlgorithmApp
 
         }
 
-        private void Crossover()
+       
+        #region Crossover
+        // Funkcja do krzyżowania: Tabel - tabela używana do krzyżowania, STSize rozmiar tabeli(tak naprawdę nie potrzebny można użyć .Length)
+        double[][] Crossing(double[][] Tabel)
         {
+            uint STSize = Convert.ToUInt32(Tabel.Length);
+            // tabela pomocnicza 
+            double[][] StartTabel = new double[Tabel.Length][];
+            Array.Copy(Tabel, StartTabel, Tabel.Length);
+            // tabela do której będą wpisywane punkty stworzone na podstawie krzyżowania(fuck nie jestem pewnien co się stanie jak będzie nieparzysta liczba osobników)
+            double[][] EndTabel = new double[STSize / 2][];
+            // pętla dla całej tabeli EndTable
+            for (int i = 0; i < (STSize / 2); i++)
+            {
+                // Losowanie pierwszego osobnika
+                uint los1 = trandom.NextUInt(0, Convert.ToUInt32(StartTabel.Length) - 1);
+                Bieda:
+                //Losowanie drugiego osobnika
+                uint los2 = trandom.NextUInt(0, Convert.ToUInt32(StartTabel.Length) - 1);
+                //Sprawdzanie czy nie wylosowało jakimś cudem tych samych osobników, nie jestem pewnie czy nie będzie problemów z goto
+                if (los1 == los2)
+                {
+                    goto Bieda;
+                }
+                // tabela pomocnicza jednowymiarowa z wyliczonymi współrzędnymi nowego osobnika
+                double[] tab = CreatePointUsingLines(StartTabel[los1][0], StartTabel[los1][1], StartTabel[los2][0], StartTabel[los2][1], 0, 100, 0, 100);
+                // usuwanie wykorzystanych osobników
+                StartTabel = JebanieOsobnikow(StartTabel, StartTabel.Length, los1, los2);
 
+                EndTabel[i] = new double[2];
+                EndTabel[i][0] = tab[0];
+                EndTabel[i][1] = tab[1];
+
+            }
+
+            return EndTabel;
         }
+
+
+        //Funkcja do tworzenia dziecka z 2 osobników: xa - pierwsza współrzędna z pierwszego osobnika,xb - druga współrzędna z pierwszego osobnika,ya - pierwsza współrzędna z drugiego osobnika,yb - druga współrzędna z drugiego osobnika
+        //BeginOdlegloscOdProstej i EndOdlegloscOdProstej - ustalanie przedziału w jakim ma być losowana odległość prostej równoległej od prostej przechodzącej przez dwa punkty,BeginWartoscX i EndWartoscX - musi być jakiś przedział dla wylosowania x-owej punktu na równoległej 
+        double[] CreatePointUsingLines(double xa, double xb, double ya, double yb, double BeginOdlegloscOdProstej, double EndOdlegloscOdProstej, double BeginWartoscX, double EndWartoscX)
+        {
+            double[] tab = new double[2];
+            tab[0] = trandom.NextDouble(BeginWartoscX, EndWartoscX);
+            double a = trandom.NextDouble(BeginOdlegloscOdProstej, EndOdlegloscOdProstej);
+
+            // Piękna funkcja na prostą przechodzącą przez dwa punkty, tab[0] to losowy x dla tworzonego punktu, tab[1] to y nowego punktu liczony na podstawie wzoru
+            tab[1] = (((ya - yb) / (xa - xb)) * tab[0]) + ((ya - ((ya - yb) / (ya - xb))) * xa);
+
+            return tab;
+        }
+
+
+        //Funkcja do usuwania elementu z tablicy: Tab - Tablica z której usuwa, IloscSkurwysynow - ilość elemetnów w tablicy z której usuwamy, Jebnij i Pierdolnij - 2 elemetny z tablicy które usuwamy
+        double[][] JebanieOsobnikow(double[][] Tab, int IloscSkurwysynow, double Jebnij, double Pierdolnij)
+        {
+            // kurwa - zmienna pomocnicza 
+            int kurwa = 0;
+            // tworzy nową tabel z -2 elemetami
+            double[][] NewTab = new double[(IloscSkurwysynow - 2)][];
+            // leci po wszystkich osobnikach w przyjmowanej tabeli
+            for (int i = 0; i < IloscSkurwysynow; i++)
+            {
+                NewTab[i] = new double[2];
+                // sprawdza czy trafiło na osobników skazanych na śmierć 
+                if (i != Jebnij || i != Pierdolnij)
+                {
+                    // mamy tylko 2 współrzędne więc eazy 
+                    for (int j = 0; i < 2; i++)
+                    {
+                        // dodawanie osobników ktrzy przeżyli czystki etniczne 
+                        NewTab[kurwa][j] = Tab[i][j];
+                    }
+                    kurwa++;
+                }
+            }
+
+            return NewTab;
+        }
+        #endregion
 
 
         private void Start_Click(object sender, RoutedEventArgs e)

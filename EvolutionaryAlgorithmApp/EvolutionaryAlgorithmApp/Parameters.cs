@@ -33,7 +33,9 @@ namespace EvolutionaryAlgorithmApp
         public int IterationNumber { get; set; }
 
         //  iteracje, X, Y
-        public double[][][] Population; // [2][popsize][popsize]
+        public double[][] Population; // [popsize][2]
+        public double[][] PopulationAfterSelection;
+        public double[][] PopulationAfterCrossing;
 
     }
 }
