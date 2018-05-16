@@ -46,6 +46,9 @@ namespace EvolutionaryAlgorithmApp
         private double[][] Population;
         private double[][] PopulationAfterSelection;
         private double[][] PopulationAfterCrossing;
+        private double MinF1;
+        private double MinF2;
+        private string Minimum;
 
 
 
@@ -109,7 +112,9 @@ namespace EvolutionaryAlgorithmApp
             Population = _parameters.Population;
             PopulationAfterSelection = _parameters.PopulationAfterSelection;
             PopulationAfterCrossing = _parameters.PopulationAfterCrossing;
-            Population = _parameters.Population;
+            MinF1 = _parameters.MinF1;
+            MinF2 = _parameters.MinF2;
+            Minimum = _parameters.Minimum;
             _parameters.ListOfPoints = new LiveCharts.ChartValues<ObservablePoint>();
         }
 
@@ -121,10 +126,7 @@ namespace EvolutionaryAlgorithmApp
             // iteracje maja timer po to aby mozna bylo zauwazyc na interfejsie ksztaltowanie punktow
             // dzieki wykorzystaniu async await workerow interfejs graficzny nie bedzie blokowany
             InitializePopulation(ref Population, Pop_Size);
-            FillRandomValues(ref Population);
-
             InitializePopulation(ref PopulationAfterSelection, Pop_Size / 2);
-
             InitializePopulation(ref PopulationAfterCrossing, Pop_Size / 4);
 
 
@@ -144,9 +146,9 @@ namespace EvolutionaryAlgorithmApp
                 // selekcja turniejowa --> losujemy 2 punkty z populacji i wygrywa lepszy (o mniejszej wartosci), 
                 // dzielimy popsize na 2 rowne zbiory i jeden zbior jest porownywany wzgledem f1 a drugi wzgledem f2
 
-                //PopulationAfterSelection = Selection(Population);
-
-              . 
+                Selection(Population, ref PopulationAfterSelection);
+            
+              
 
                 // selekcja ruletkowa --> obliczamy fitness, jaki to jest procent z calosci dla danego osobnika, obliczamy dystrybuante,
                 // generujemy liczby losowe i szeregujemy okreslajac ktore elementy maja przetrwac
@@ -177,6 +179,9 @@ namespace EvolutionaryAlgorithmApp
 
 
                 // obliczenie minimum
+                SearchForMinValue(PopulationAfterCrossing, ref MinF1, ref MinF2);
+
+                Minimum = $"{{{MinF1}.{MinF2}}}";
 
                 // finalne utworzenie wykresu dziedziny oraz pareto frontu a takze wykresu wartosci poszczegolnych funkcji
 
@@ -184,6 +189,24 @@ namespace EvolutionaryAlgorithmApp
 
                 // musimy obliczyc jeszcze to spierdolone odchylenie
                 // suma po wszystkich punktach w populacji (od i do licznosci pareto frontu) |f(f1) - f2|
+            }
+        }
+
+        private void SearchForMinValue(double[][] PopulationAfterCrossing, ref double MinF1, ref double MinF2)
+        {
+            MinF1 = PopulationAfterCrossing[0][0];
+            MinF2 = PopulationAfterCrossing[0][1];
+
+            for (int i = 0; i < PopulationAfterCrossing.Length; i++)
+            {
+                if (PopulationAfterCrossing[i][0] < MinF1)
+                {
+                    MinF1 = PopulationAfterCrossing[i][0];
+                }
+                if (PopulationAfterCrossing[i][1] < MinF2)
+                {
+                    MinF2 = PopulationAfterCrossing[i][1];
+                }
             }
         }
 
@@ -214,9 +237,69 @@ namespace EvolutionaryAlgorithmApp
             }
         }
 
-        private void Selection()
+        private void Selection(double[][] Population, ref double[][] PopulationAfterSelection)
         {
+            HashSet<int> numbers1 = new HashSet<int>();
+            HashSet<int> numbers2 = new HashSet<int>();
 
+            for (int i = 0; i < Pop_Size/4; i++)
+            {
+
+                int trandom1 = (int)(trandom.NextUInt(0, (uint)Pop_Size / 2));
+                int trandom2 = (int)(trandom.NextUInt(0, (uint)Pop_Size / 2));
+
+                while (!numbers1.Contains(trandom1))
+                {
+                    trandom1 = (int)(trandom.NextUInt(0, (uint)Pop_Size / 2));
+                }
+                numbers1.Add(trandom1);
+
+                while (!numbers1.Contains(trandom2))
+                {
+                    trandom2 = (int)(trandom.NextUInt(0, (uint)Pop_Size / 2));
+                }
+                numbers1.Add(trandom2);
+
+                if (Population[trandom1][0] < Population[trandom2][0])
+                {
+                    PopulationAfterSelection[i][0] = Population[trandom1][0];
+                    PopulationAfterSelection[i][1] = Population[trandom1][1];
+                }
+                else
+                {
+                    PopulationAfterSelection[i][0] = Population[trandom2][0];
+                    PopulationAfterSelection[i][1] = Population[trandom2][1];
+                }
+               
+            }
+            for (int i = Pop_Size / 4; i < Pop_Size / 2; i++)
+            {
+                int trandom1 = (int)(trandom.NextUInt(0, (uint)Pop_Size / 2));
+                int trandom2 = (int)(trandom.NextUInt(0, (uint)Pop_Size / 2));
+
+                while (!numbers2.Contains(trandom1))
+                {
+                    trandom1 = (int)(trandom.NextUInt(0, (uint)Pop_Size / 2));
+                }
+                numbers2.Add(trandom1);
+
+                while (!numbers2.Contains(trandom2))
+                {
+                    trandom2 = (int)(trandom.NextUInt(0, (uint)Pop_Size / 2));
+                }
+                numbers2.Add(trandom2);
+
+                if (Population[trandom1][1] < Population[trandom2][1])
+                {
+                    PopulationAfterSelection[i][0] = Population[trandom1][0];
+                    PopulationAfterSelection[i][1] = Population[trandom1][1];
+                }
+                else
+                {
+                    PopulationAfterSelection[i][0] = Population[trandom2][0];
+                    PopulationAfterSelection[i][1] = Population[trandom2][1];
+                }
+            }
         }
 
         private void Mutation()
@@ -251,7 +334,7 @@ namespace EvolutionaryAlgorithmApp
                 // tabela pomocnicza jednowymiarowa z wyliczonymi współrzędnymi nowego osobnika
                 double[] tab = CreatePointUsingLines(StartTabel[los1][0], StartTabel[los1][1], StartTabel[los2][0], StartTabel[los2][1], 0, 100, 0, 100);
                 // usuwanie wykorzystanych osobników
-                StartTabel = JebanieOsobnikow(StartTabel, StartTabel.Length, los1, los2);
+                StartTabel = WyrzucanieOsobnikow(StartTabel, StartTabel.Length, los1, los2);
 
                 EndTabel[i] = new double[2];
                 EndTabel[i][0] = tab[0];
@@ -279,26 +362,26 @@ namespace EvolutionaryAlgorithmApp
 
 
         //Funkcja do usuwania elementu z tablicy: Tab - Tablica z której usuwa, IloscSkurwysynow - ilość elemetnów w tablicy z której usuwamy, Jebnij i Pierdolnij - 2 elemetny z tablicy które usuwamy
-        double[][] JebanieOsobnikow(double[][] Tab, int IloscSkurwysynow, double Jebnij, double Pierdolnij)
+        double[][] WyrzucanieOsobnikow(double[][] Tab, int IloscOsobnikow, double Wyrzutek1, double Wyrzutek2)
         {
             // kurwa - zmienna pomocnicza 
-            int kurwa = 0;
+            int counter = 0;
             // tworzy nową tabel z -2 elemetami
-            double[][] NewTab = new double[(IloscSkurwysynow - 2)][];
+            double[][] NewTab = new double[(IloscOsobnikow - 2)][];
             // leci po wszystkich osobnikach w przyjmowanej tabeli
-            for (int i = 0; i < IloscSkurwysynow; i++)
+            for (int i = 0; i < IloscOsobnikow; i++)
             {
                 NewTab[i] = new double[2];
                 // sprawdza czy trafiło na osobników skazanych na śmierć 
-                if (i != Jebnij || i != Pierdolnij)
+                if (i != Wyrzutek1 || i != Wyrzutek2)
                 {
                     // mamy tylko 2 współrzędne więc eazy 
                     for (int j = 0; i < 2; i++)
                     {
                         // dodawanie osobników ktrzy przeżyli czystki etniczne 
-                        NewTab[kurwa][j] = Tab[i][j];
+                        NewTab[counter][j] = Tab[i][j];
                     }
-                    kurwa++;
+                    counter++;
                 }
             }
 
@@ -313,11 +396,8 @@ namespace EvolutionaryAlgorithmApp
             ParetoChart.MakeParetoFunctions();
             ReinitializeVariables();
             worker.RunWorkerAsync();
-            
+            //EvolutionaryCore();
         }
-
-
-
 
 
         private void Stop_Click(object sender, RoutedEventArgs e)
@@ -327,7 +407,6 @@ namespace EvolutionaryAlgorithmApp
 
 
         // tutaj po prostu ustawiamy wszystkie wartosci w parameters i potem sa one wyswietlane na ekranie
-
 
         #region Stary reset
 
