@@ -41,5 +41,15 @@ namespace EvolutionaryAlgorithmApp
         public double MinF1 { get; set; }
         public double MinF2 { get; set; }
 
+        public void RewriteThePoints(double[][] tempTab)
+        {
+            ListOfPoints = new ChartValues<ObservablePoint>();
+            for (int i = 0; i < tempTab.Length; i++)
+            {
+                ListOfPoints.Add(new ObservablePoint(tempTab[i][0], tempTab[i][1]));
+            }
+        }
+
+
     }
 }
