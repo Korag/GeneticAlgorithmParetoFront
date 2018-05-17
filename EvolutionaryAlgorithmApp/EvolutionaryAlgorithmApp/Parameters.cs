@@ -35,6 +35,7 @@ namespace EvolutionaryAlgorithmApp
         //  iteracje, X, Y
         public double[][] Population; // [popsize][2]
         public double[][] PopulationAfterSelection;
+        public double[][] PopulationAfterMutation;
         public double[][] PopulationAfterCrossing;
 
         //minimum dla f1 oraz f2

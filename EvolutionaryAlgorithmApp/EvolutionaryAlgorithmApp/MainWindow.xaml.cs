@@ -45,10 +45,15 @@ namespace EvolutionaryAlgorithmApp
         private double Sleeper;
         private double[][] Population;
         private double[][] PopulationAfterSelection;
+        private double[][] PopulationAfterMutation;
         private double[][] PopulationAfterCrossing;
         private double MinF1;
         private double MinF2;
         private string Minimum;
+        private bool refill = false;
+
+        private int IterationLimit;
+        private int IterationNumber;
 
 
 
@@ -97,15 +102,22 @@ namespace EvolutionaryAlgorithmApp
                 wykres.EditSeriesCollection(_parameters.ListOfPoints);
             }
 
-            int x = 0;
+     
 
-            while (x<5)
+            while (IterationNumber<IterationLimit)
             {
+                // inicjalizacja tablic
+                InitializePopulation(ref PopulationAfterSelection, Pop_Size / 2);
+                InitializePopulation(ref PopulationAfterMutation, Pop_Size / 2);
+                InitializePopulation(ref PopulationAfterCrossing, Pop_Size / 4);
+
                 // czas na obserwacje popsize'a i wykresu wartosci funkcji
 
                 // wszystkie operacje wykonujemy na tablicy znajdujacej sie w Parameters   public double[][][] Population; // [2][popsize][popsize]
 
                 FillRandomValues(ref Population);
+                // parametr, aby w nastepnej iteracji uzupelnic brakujace osobniki w populacji
+                refill = true;
 
                 // operacja selekcji
 
@@ -114,8 +126,9 @@ namespace EvolutionaryAlgorithmApp
                 // selekcja turniejowa --> losujemy 2 punkty z populacji i wygrywa lepszy (o mniejszej wartosci), 
                 // dzielimy popsize na 2 rowne zbiory i jeden zbior jest porownywany wzgledem f1 a drugi wzgledem f2
 
-                Selection(Population, ref PopulationAfterSelection);
 
+  
+                Selection(Population, ref PopulationAfterSelection);
 
 
                 // selekcja ruletkowa --> obliczamy fitness, jaki to jest procent z calosci dla danego osobnika, obliczamy dystrybuante,
@@ -124,9 +137,10 @@ namespace EvolutionaryAlgorithmApp
                 // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
 
 
-                // operacja mutacji
+                // operacja
+                Mutation(PopulationAfterSelection, ref PopulationAfterMutation);
 
-                Mutation(ref PopulationAfterCrossing);
+
                 // losujemy ktore punkty zostana poddane mutacji (sprawdzamy wszystkie pod wzgledem prawdopodobienstwa) (prawdopodobienstwo mutacji dla kazdego osobnika)
                 // jezeli wylosowano osobnika to losujemy kat oraz dlugosc wektora
                 // sprawdzamy czy zmutowany osobnik znajduje sie w dziedzinie
@@ -140,8 +154,7 @@ namespace EvolutionaryAlgorithmApp
                 // ogolnie to staramy sie tak skrzyzowac aby np calkowicie odbic jeden punkt 
                 // do dyskusji jak to robimy
 
-
-                PopulationAfterCrossing = Crossing(PopulationAfterSelection);
+                PopulationAfterCrossing = Crossing(PopulationAfterMutation);
 
                 // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
 
@@ -153,9 +166,14 @@ namespace EvolutionaryAlgorithmApp
 
                 Minimum = $"{{{MinF1}.{MinF2}}}";
 
-
+                // przepisywanie tablicy PopulationAfterCrossing do Population
                 Array.Clear(Population, 0, Population.Length);
                 Array.Copy(PopulationAfterCrossing, Population, PopulationAfterCrossing.Length);
+
+                // czyszczenie tablic
+                Array.Clear(PopulationAfterSelection, 0, PopulationAfterSelection.Length);
+                Array.Clear(PopulationAfterMutation, 0, PopulationAfterMutation.Length);
+                Array.Clear(PopulationAfterCrossing, 0, PopulationAfterCrossing.Length);
 
                 // finalne utworzenie wykresu dziedziny oraz pareto frontu a takze wykresu wartosci poszczegolnych funkcji
 
@@ -164,7 +182,7 @@ namespace EvolutionaryAlgorithmApp
                 // musimy obliczyc jeszcze to spierdolone odchylenie
                 // suma po wszystkich punktach w populacji (od i do licznosci pareto frontu) |f(f1) - f2|
                 Thread.Sleep(200);
-                x++;
+                IterationNumber++;
             }
 
         }
@@ -181,91 +199,98 @@ namespace EvolutionaryAlgorithmApp
             Sleeper = _parameters.SleepTime;
             Population = _parameters.Population;
             PopulationAfterSelection = _parameters.PopulationAfterSelection;
+            PopulationAfterMutation = _parameters.PopulationAfterMutation;
             PopulationAfterCrossing = _parameters.PopulationAfterCrossing;
             MinF1 = _parameters.MinF1;
             MinF2 = _parameters.MinF2;
             Minimum = _parameters.Minimum;
+            IterationLimit = _parameters.IterationLimit;
+            IterationNumber = _parameters.IterationNumber;
             _parameters.ListOfPoints = new LiveCharts.ChartValues<ObservablePoint>();
         }
 
+        #region Stary Core
         // Serce programu wszystko bedzie odbwac sie wlasnie tutaj
-        private void EvolutionaryCore()
-        {
-            // ta metoda bedzie wywolywana po nacisnieciu przycisku start - przerywana jest dopiero
-            // w momencie gdy nacisnie sie przycisk stop
-            // iteracje maja timer po to aby mozna bylo zauwazyc na interfejsie ksztaltowanie punktow
-            // dzieki wykorzystaniu async await workerow interfejs graficzny nie bedzie blokowany
-            InitializePopulation(ref Population, Pop_Size);
-            InitializePopulation(ref PopulationAfterSelection, Pop_Size / 2);
-            InitializePopulation(ref PopulationAfterCrossing, Pop_Size / 4);
-
-          
-
-            // teraz ta petla ma byc przerwana kiedy nacisniemy stop
-            while (true)
-            {
-                // czas na obserwacje popsize'a i wykresu wartosci funkcji
-
-                // wszystkie operacje wykonujemy na tablicy znajdujacej sie w Parameters   public double[][][] Population; // [2][popsize][popsize]
-
-                FillRandomValues(ref Population);
-
-                // operacja selekcji
-
-                // 2 warianty i tutaj trzeba zrobic ze na zasadzie losowej jest wybierana metoda selekcji
-
-                // selekcja turniejowa --> losujemy 2 punkty z populacji i wygrywa lepszy (o mniejszej wartosci), 
-                // dzielimy popsize na 2 rowne zbiory i jeden zbior jest porownywany wzgledem f1 a drugi wzgledem f2
-
-                Selection(Population, ref PopulationAfterSelection);
+        //private void EvolutionaryCore()
+        //{
+        //    // ta metoda bedzie wywolywana po nacisnieciu przycisku start - przerywana jest dopiero
+        //    // w momencie gdy nacisnie sie przycisk stop
+        //    // iteracje maja timer po to aby mozna bylo zauwazyc na interfejsie ksztaltowanie punktow
+        //    // dzieki wykorzystaniu async await workerow interfejs graficzny nie bedzie blokowany
+        //    InitializePopulation(ref Population, Pop_Size);
+        //    InitializePopulation(ref PopulationAfterSelection, Pop_Size / 2);
+        //    InitializePopulation(ref PopulationAfterCrossing, Pop_Size / 4);
 
 
 
-                // selekcja ruletkowa --> obliczamy fitness, jaki to jest procent z calosci dla danego osobnika, obliczamy dystrybuante,
-                // generujemy liczby losowe i szeregujemy okreslajac ktore elementy maja przetrwac
+        //    // teraz ta petla ma byc przerwana kiedy nacisniemy stop
+        //    while (true)
+        //    {
+        //        // czas na obserwacje popsize'a i wykresu wartosci funkcji
 
-                // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
+        //        // wszystkie operacje wykonujemy na tablicy znajdujacej sie w Parameters   public double[][][] Population; // [2][popsize][popsize]
 
+        //        FillRandomValues(ref Population);
+        //       
 
-                // operacja mutacji
+        //        // operacja selekcji
 
-                Mutation(ref PopulationAfterCrossing);
-                // losujemy ktore punkty zostana poddane mutacji (sprawdzamy wszystkie pod wzgledem prawdopodobienstwa) (prawdopodobienstwo mutacji dla kazdego osobnika)
-                // jezeli wylosowano osobnika to losujemy kat oraz dlugosc wektora
-                // sprawdzamy czy zmutowany osobnik znajduje sie w dziedzinie
-                // jezeli nie wykorzystujemy funkcje kary aby zwiekszyc wartosc osobnika
+        //        // 2 warianty i tutaj trzeba zrobic ze na zasadzie losowej jest wybierana metoda selekcji
 
-                // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
+        //        // selekcja turniejowa --> losujemy 2 punkty z populacji i wygrywa lepszy (o mniejszej wartosci), 
+        //        // dzielimy popsize na 2 rowne zbiory i jeden zbior jest porownywany wzgledem f1 a drugi wzgledem f2
 
-
-                // operacja krzyzowania
-                // to jest chyba najtrudniejsza operacja, duzo pierdolenia z przeksztalceniami
-                // ogolnie to staramy sie tak skrzyzowac aby np calkowicie odbic jeden punkt 
-                // do dyskusji jak to robimy
-
-                PopulationAfterCrossing = Crossing(PopulationAfterSelection);
-
-                // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
-                
+        //        Selection(Population, ref PopulationAfterSelection);
 
 
-                // obliczenie minimum
-                SearchForMinValue(PopulationAfterCrossing, ref MinF1, ref MinF2);
 
-                Minimum = $"{{{MinF1}.{MinF2}}}";
+        //        // selekcja ruletkowa --> obliczamy fitness, jaki to jest procent z calosci dla danego osobnika, obliczamy dystrybuante,
+        //        // generujemy liczby losowe i szeregujemy okreslajac ktore elementy maja przetrwac
+
+        //        // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
 
 
-                Array.Clear(Population, 0, Population.Length);
-                Array.Copy(PopulationAfterCrossing, Population, PopulationAfterCrossing.Length);
+        //        // operacja mutacji
 
-                // finalne utworzenie wykresu dziedziny oraz pareto frontu a takze wykresu wartosci poszczegolnych funkcji
+        //        Mutation(ref PopulationAfterCrossing);
+        //        // losujemy ktore punkty zostana poddane mutacji (sprawdzamy wszystkie pod wzgledem prawdopodobienstwa) (prawdopodobienstwo mutacji dla kazdego osobnika)
+        //        // jezeli wylosowano osobnika to losujemy kat oraz dlugosc wektora
+        //        // sprawdzamy czy zmutowany osobnik znajduje sie w dziedzinie
+        //        // jezeli nie wykorzystujemy funkcje kary aby zwiekszyc wartosc osobnika
 
-                // jezeli przez 5 iteracji nie ma poprawy minimum zatrzymujemy algorytm
+        //        // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
 
-                // musimy obliczyc jeszcze to spierdolone odchylenie
-                // suma po wszystkich punktach w populacji (od i do licznosci pareto frontu) |f(f1) - f2|
-            }
-        }
+
+        //        // operacja krzyzowania
+        //        // to jest chyba najtrudniejsza operacja, duzo pierdolenia z przeksztalceniami
+        //        // ogolnie to staramy sie tak skrzyzowac aby np calkowicie odbic jeden punkt 
+        //        // do dyskusji jak to robimy
+
+        //        PopulationAfterCrossing = Crossing(PopulationAfterSelection);
+
+        //        // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
+
+
+
+        //        // obliczenie minimum
+        //        SearchForMinValue(PopulationAfterCrossing, ref MinF1, ref MinF2);
+
+        //        Minimum = $"{{{MinF1}.{MinF2}}}";
+
+
+        //        Array.Clear(Population, 0, Population.Length);
+        //        Array.Copy(PopulationAfterCrossing, Population, Population.Length);
+
+        //        // finalne utworzenie wykresu dziedziny oraz pareto frontu a takze wykresu wartosci poszczegolnych funkcji
+
+        //        // jezeli przez 5 iteracji nie ma poprawy minimum zatrzymujemy algorytm
+
+        //        // musimy obliczyc jeszcze to spierdolone odchylenie
+        //        // suma po wszystkich punktach w populacji (od i do licznosci pareto frontu) |f(f1) - f2|
+        //    }
+        //}
+
+        #endregion
 
         private void SearchForMinValue(double[][] PopulationAfterCrossing, ref double MinF1, ref double MinF2)
         {
@@ -289,44 +314,20 @@ namespace EvolutionaryAlgorithmApp
         {
             for (int i = 0; i < Population.Length; i++)
             {
-
-                    for (int j = 0; j < Population[i].Length; j++)
+            if (refill)
+            {
+                    for (int j = Pop_Size/4; j < Pop_Size; j++)
                     {
-                        if (Population[i][0] == 0 && Population[i][1] == 0 && j == 0)
-                        {
-                            Population[i][j] = trandom.NextDouble(F1LeftConstraint, F1RightConstraint);
-                        }
-                        else if (Population[i][0] == 0 && Population[i][1] == 0 && j == 1)
-                        {
-                            Population[i][j] = trandom.NextDouble(F2LeftConstraint, F2RightConstraint);
-                        }
+                        Population[j] = new double[2];
+
+                        Population[j][0] = trandom.NextDouble(F1LeftConstraint, F1RightConstraint);
+                        Population[j][1] = trandom.NextDouble(F2LeftConstraint, F2RightConstraint);
                     }
+                    break;
+            }
+             Population[i][0] = trandom.NextDouble(F1LeftConstraint, F1RightConstraint);
+             Population[i][1] = trandom.NextDouble(F2LeftConstraint, F2RightConstraint);
 
-
-
-
-                //try
-                //{
-                //    for (int j = 0; j < Population[i].Length; j++)
-                //    {
-                //        if (Population[i][0] == 0 && Population[i][1] == 0 && j == 0)
-                //        {
-                //            Population[i][j] = trandom.NextDouble(F1LeftConstraint, F1RightConstraint);
-                //        }
-                //        else if (Population[i][0] == 0 && Population[i][1] == 0 && j == 1)
-                //        {
-                //            Population[i][j] = trandom.NextDouble(F2LeftConstraint, F2RightConstraint);
-                //        }
-                //    }
-                //}
-                //catch (Exception)
-                //{
-
-                //    Population[i] = new double[2];
-                //    Population[i][0] = trandom.NextDouble(F1LeftConstraint, F1RightConstraint);
-                //    Population[i][1] = trandom.NextDouble(F1LeftConstraint, F1RightConstraint);
-
-                //}
             }
         }
 
@@ -406,11 +407,11 @@ namespace EvolutionaryAlgorithmApp
             }
         }
 
-        private void Mutation(ref double[][] tempTab)
+        private void Mutation(double[][] tempTab, ref double[][] resultTable )
         {
             double Angle = 0;
             double Radius = 0;
-            for (int i = 0; i < tempTab.Length; i++)
+            for (int i = 0; i < resultTable.Length; i++)
             {
                 //jesli wylosowana liczba jest mniejsza niz prawdopodobienstwo mutacji to mutujemy(losujemy liczbe z 
                 //przedziału (0,1) wiec dla prawdopodobienstwa mutacji = 1 mutacja występuje za każdym razem)
@@ -418,13 +419,14 @@ namespace EvolutionaryAlgorithmApp
                 {
                     Angle = trandom.NextDouble(0, 2 * Math.PI);
                     Radius = trandom.NextDouble(0, 1);
-                    tempTab[i][0] = Math.Cos(Angle) * Radius + tempTab[i][0];
-                    tempTab[i][1] = Math.Sin(Angle) * Radius + tempTab[i][1];
+                    resultTable[i][0] = Math.Cos(Angle) * Radius + tempTab[i][0];
+                    resultTable[i][1] = Math.Sin(Angle) * Radius + tempTab[i][1];
 
-                    if (CheckPointsDomain(tempTab[i][0], tempTab[i][1]))
+                    if (CheckPointsDomain(resultTable[i][0], resultTable[i][1]))
                     {
-                        tempTab[i][1] += 10;
+                        resultTable[i][1] += 1000;
                     }
+
 
 
                     //sprawdzenie czy wychodzi z dziedziny jak tak to albo losujemy od nowa r i kąt albo dzielimy je przez 2 albo funkcja kary
@@ -439,11 +441,14 @@ namespace EvolutionaryAlgorithmApp
                     //    Radius /= 2;
                     //    tempTab[i][0] = Math.Cos(Angle) * Radius + tempTab[i][0];
                     //    tempTab[i][1] = Math.Sin(Angle) * Radius + tempTab[i][1];
-                    //}
+                    //
+                }
+                else
+                {
+                    resultTable[i][0] = tempTab[i][0];
+                    resultTable[i][1] = tempTab[i][1];
                 }
             }
-            //nie wiem czy ma zwracac
-           // return tempTab;
         }
         private bool CheckPointsDomain(double x1, double x2)
         {
@@ -484,7 +489,7 @@ namespace EvolutionaryAlgorithmApp
                     goto Bieda;
                 }
                 // tabela pomocnicza jednowymiarowa z wyliczonymi współrzędnymi nowego osobnika
-                double[] tab = CreatePointUsingLines(StartTabel[los1][0], StartTabel[los1][1], StartTabel[los2][0], StartTabel[los2][1], 0, 100, 0, 100);
+                double[] tab = CreatePointUsingLines(StartTabel[los1][0], StartTabel[los1][1], StartTabel[los2][0], StartTabel[los2][1], 0, 2, 0, 2);
                 // usuwanie wykorzystanych osobników
                 StartTabel = WyrzucanieOsobnikow(StartTabel, StartTabel.Length, los1, los2);
 
@@ -547,9 +552,8 @@ namespace EvolutionaryAlgorithmApp
             Start.IsEnabled = false;
             ParetoChart.MakeParetoFunctions();
             ReinitializeVariables();
+
             InitializePopulation(ref Population, Pop_Size);
-            InitializePopulation(ref PopulationAfterSelection, Pop_Size / 2);
-            InitializePopulation(ref PopulationAfterCrossing, Pop_Size / 4);
             worker.RunWorkerAsync();
             //EvolutionaryCore();
         }
