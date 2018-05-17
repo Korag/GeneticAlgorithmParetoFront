@@ -129,6 +129,7 @@ namespace EvolutionaryAlgorithmApp
             InitializePopulation(ref PopulationAfterSelection, Pop_Size / 2);
             InitializePopulation(ref PopulationAfterCrossing, Pop_Size / 4);
 
+          
 
             // teraz ta petla ma byc przerwana kiedy nacisniemy stop
             while (true)
@@ -182,6 +183,10 @@ namespace EvolutionaryAlgorithmApp
                 SearchForMinValue(PopulationAfterCrossing, ref MinF1, ref MinF2);
 
                 Minimum = $"{{{MinF1}.{MinF2}}}";
+
+
+                Array.Clear(Population, 0, Population.Length);
+                Array.Copy(PopulationAfterCrossing, Population, PopulationAfterCrossing.Length);
 
                 // finalne utworzenie wykresu dziedziny oraz pareto frontu a takze wykresu wartosci poszczegolnych funkcji
 
