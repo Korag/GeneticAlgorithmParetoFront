@@ -91,11 +91,8 @@ namespace EvolutionaryAlgorithmApp.UserControls
             SeriesCollection.Add(new LineSeries
             {
                 Title = "Series 4",
-                Values = new ChartValues<double> { 5, 3, 2, 4 },
+                Values = new ChartValues<double>(),
                 LineSmoothness = 0, //0: straight lines, 1: really smooth lines
-                PointGeometry = Geometry.Parse("m 25 70.36218 20 -28 -20 22 -8 -6 z"),
-                PointGeometrySize = 50,
-                PointForeground = Brushes.Gray
             });
 
             //modifying any series values will also animate and update the chart
@@ -123,12 +120,14 @@ namespace EvolutionaryAlgorithmApp.UserControls
                 new LineSeries
                 {
                     Title = "Bottom Pareto",
-                    Values = CreateBottomPareto()
+                    Values = CreateBottomPareto(),
+                    LineSmoothness = 0
                 },
                 new LineSeries
                 {
                     Title = "Top Pareto",
-                    Values = CreateTopPareto()
+                    Values = CreateTopPareto(),
+                    LineSmoothness = 0
                 },
             };
         }

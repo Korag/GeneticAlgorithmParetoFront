@@ -27,7 +27,7 @@
             </lvc:CartesianChart.AxisX>
         </lvc:CartesianChart>
 
-        <lvc:CartesianChart LegendLocation="Bottom">
+        <lvc:CartesianChart LegendLocation="Bottom" Margin="0 5 0 0">
             <lvc:CartesianChart.Series>
                 <lvc:ScatterSeries Title="Series A" Values="{Binding ValuesA , FallbackValue=null}" />
                 <lvc:ScatterSeries Title="Series B" Values="{Binding ValuesB , FallbackValue=null}"
@@ -40,7 +40,7 @@
                 <!--setting the axis unit improved the labels rounding rule-->
                 <lvc:Axis Unit="1">
                     <lvc:Axis.Separator>
-                        <lvc:Separator Step="100"></lvc:Separator>
+                        <lvc:Separator Step="1"></lvc:Separator>
                     </lvc:Axis.Separator>
                 </lvc:Axis>
             </lvc:CartesianChart.AxisY>
@@ -48,7 +48,7 @@
                 <!--setting the axis unit improved the labels rounding rule-->
                 <lvc:Axis Unit="1">
                     <lvc:Axis.Separator>
-                        <lvc:Separator Step="100"></lvc:Separator>
+                        <lvc:Separator Step="1"></lvc:Separator>
                     </lvc:Axis.Separator>
                 </lvc:Axis>
             </lvc:CartesianChart.AxisX>
