@@ -104,7 +104,7 @@ namespace EvolutionaryAlgorithmApp
 
      
 
-            while (IterationNumber<IterationLimit)
+            while (_parameters.IterationNumber<_parameters.IterationLimit)
             {
                 // inicjalizacja tablic
                 InitializePopulation(ref PopulationAfterSelection, Pop_Size / 2);
@@ -154,7 +154,7 @@ namespace EvolutionaryAlgorithmApp
                 // ogolnie to staramy sie tak skrzyzowac aby np calkowicie odbic jeden punkt 
                 // do dyskusji jak to robimy
 
-                PopulationAfterCrossing = Crossing(PopulationAfterMutation);
+                Crossing(PopulationAfterMutation, ref PopulationAfterCrossing);
 
                 // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
 
@@ -164,7 +164,7 @@ namespace EvolutionaryAlgorithmApp
                 // obliczenie minimum
                 SearchForMinValue(PopulationAfterCrossing, ref MinF1, ref MinF2);
 
-                Minimum = $"{{{MinF1}.{MinF2}}}";
+                _parameters.Minimum = $"{{{Math.Round(MinF1,2)}.{Math.Round(MinF2,2)}}}";
 
                 // przepisywanie tablicy PopulationAfterCrossing do Population
                 Array.Clear(Population, 0, Population.Length);
@@ -182,7 +182,7 @@ namespace EvolutionaryAlgorithmApp
                 // musimy obliczyc jeszcze to spierdolone odchylenie
                 // suma po wszystkich punktach w populacji (od i do licznosci pareto frontu) |f(f1) - f2|
                 Thread.Sleep(200);
-                IterationNumber++;
+                _parameters.IterationNumber++;
             }
 
         }
@@ -424,7 +424,7 @@ namespace EvolutionaryAlgorithmApp
 
                     if (CheckPointsDomain(resultTable[i][0], resultTable[i][1]))
                     {
-                        resultTable[i][1] += 1000;
+                        resultTable[i][1] += 20;
                     }
 
 
@@ -466,40 +466,50 @@ namespace EvolutionaryAlgorithmApp
         }
 
         #region Crossover
-       // Funkcja do krzyżowania: Tabel - tabela używana do krzyżowania, STSize rozmiar tabeli(tak naprawdę nie potrzebny można użyć .Length)
-       double[][] Crossing(double[][] Tabel)
+   
+       public void Crossing(double[][] Population, ref double [][] PopulationAfterCrossing)
         {
-            uint STSize = Convert.ToUInt32(Tabel.Length);
-            // tabela pomocnicza 
-            double[][] StartTabel = new double[Tabel.Length][];
-            Array.Copy(Tabel, StartTabel, Tabel.Length);
-            // tabela do której będą wpisywane punkty stworzone na podstawie krzyżowania(fuck nie jestem pewnien co się stanie jak będzie nieparzysta liczba osobników)
-            double[][] EndTabel = new double[STSize / 2][];
-            // pętla dla całej tabeli EndTable
-            for (int i = 0; i < (STSize / 2); i++)
-            {
-                // Losowanie pierwszego osobnika
-                uint los1 = trandom.NextUInt(0, Convert.ToUInt32(StartTabel.Length) - 1);
-                Bieda:
-                //Losowanie drugiego osobnika
-                uint los2 = trandom.NextUInt(0, Convert.ToUInt32(StartTabel.Length) - 1);
-                //Sprawdzanie czy nie wylosowało jakimś cudem tych samych osobników, nie jestem pewnie czy nie będzie problemów z goto
-                if (los1 == los2)
+            HashSet<int> numbers1 = new HashSet<int>();
+            HashSet<int> numbers2 = new HashSet<int>();
+
+        
+             for (int i = 0; i < Pop_Size/4; i++)
+             {
+                if (trandom.NextDouble(0, 1) < _parameters.PlausOfCrossing)
                 {
-                    goto Bieda;
+                    int trandom1 = (int)(trandom.NextUInt(0, (uint)Pop_Size / 2));
+                    int trandom2 = (int)(trandom.NextUInt(0, (uint)Pop_Size / 2));
+
+                    while (!numbers1.Contains(trandom1))
+                    {
+                        trandom1 = (int)(trandom.NextUInt(0, (uint)Pop_Size / 2));
+                        numbers1.Add(trandom1);
+                    }
+
+                    while (!numbers2.Contains(trandom2))
+                    {
+                        trandom2 = (int)(trandom.NextUInt(0, (uint)Pop_Size / 2));
+                        numbers2.Add(trandom2);
+                    }
+
+
+                    // tabela pomocnicza jednowymiarowa z wyliczonymi współrzędnymi nowego osobnika
+                    double[] tab = CreatePointUsingLines(Population[trandom1][0], Population[trandom1][1], Population[trandom2][0], Population[trandom2][1], 0, 0.25, 0, 0.25);
+
+                    PopulationAfterCrossing[i][0] = tab[0];
+                    PopulationAfterCrossing[i][1] = tab[1];
+
+                    if (CheckPointsDomain(PopulationAfterCrossing[i][0], PopulationAfterCrossing[i][1]))
+                    {
+                        PopulationAfterCrossing[i][1] += 20;
+                    }
                 }
-                // tabela pomocnicza jednowymiarowa z wyliczonymi współrzędnymi nowego osobnika
-                double[] tab = CreatePointUsingLines(StartTabel[los1][0], StartTabel[los1][1], StartTabel[los2][0], StartTabel[los2][1], 0, 2, 0, 2);
-                // usuwanie wykorzystanych osobników
-                StartTabel = WyrzucanieOsobnikow(StartTabel, StartTabel.Length, los1, los2);
-
-                EndTabel[i] = new double[2];
-                EndTabel[i][0] = tab[0];
-                EndTabel[i][1] = tab[1];
-
+                else
+                {
+                    PopulationAfterCrossing[i][0] = Population[i][0];
+                    PopulationAfterCrossing[i][1] = Population[i][1];
+                }
             }
-
-            return EndTabel;
         }
 
 
@@ -517,33 +527,6 @@ namespace EvolutionaryAlgorithmApp
             return tab;
         }
 
-
-        //Funkcja do usuwania elementu z tablicy: Tab - Tablica z której usuwa, IloscSkurwysynow - ilość elemetnów w tablicy z której usuwamy, Jebnij i Pierdolnij - 2 elemetny z tablicy które usuwamy
-        double[][] WyrzucanieOsobnikow(double[][] Tab, int IloscOsobnikow, double Wyrzutek1, double Wyrzutek2)
-        {
-            // kurwa - zmienna pomocnicza 
-            int counter = 0;
-            // tworzy nową tabel z -2 elemetami
-            double[][] NewTab = new double[IloscOsobnikow][];
-            // leci po wszystkich osobnikach w przyjmowanej tabeli
-            for (int i = 0; i < IloscOsobnikow; i++)
-            {
-                NewTab[i] = new double[2];
-                // sprawdza czy trafiło na osobników skazanych na śmierć 
-                if (i != Wyrzutek1 || i != Wyrzutek2)
-                {
-                    // mamy tylko 2 współrzędne więc eazy 
-                    for (int j = 0; j < 2; j++)
-                    {
-                        // dodawanie osobników ktrzy przeżyli czystki etniczne 
-                        NewTab[counter][j] = Tab[i][j];
-                    }
-                    counter++;
-                }
-            }
-
-            return NewTab;
-        }
         #endregion
 
 
