@@ -47,6 +47,8 @@ namespace EvolutionaryAlgorithmApp
         private double[][] PopulationAfterSelection;
         private double[][] PopulationAfterMutation;
         private double[][] PopulationAfterCrossing;
+        private double[][] PopulationFunctionValue;
+        private double[][] PopulationFunctionValueAfterSelection;
         private double MinF1;
         private double MinF2;
         private string Minimum;
@@ -60,10 +62,6 @@ namespace EvolutionaryAlgorithmApp
         public MainWindow()
         {
 
-            // maja byc fajne punkty na pareto front takie ze mozna na nie kliknac i zeby byly identyfikowalne na dziedzinie
-            // np rozne kolory na wykresie dziedziny, żeby było wiadomo jakie punkty są odwzorowane
-            // 28 maja oddanie programu !!!!!!!!!! potwierdzone info 
- 
             // 2 populacje musza migac 
             // wykres iteracji --> suma, min f1 , min f2
 
@@ -111,6 +109,9 @@ namespace EvolutionaryAlgorithmApp
                 InitializePopulation(ref PopulationAfterMutation, Pop_Size / 2);
                 InitializePopulation(ref PopulationAfterCrossing, Pop_Size / 4);
 
+                InitializePopulation(ref PopulationFunctionValue, Pop_Size);
+                InitializePopulation(ref PopulationFunctionValueAfterSelection, Pop_Size/2);
+
                 // czas na obserwacje popsize'a i wykresu wartosci funkcji
 
                 // wszystkie operacje wykonujemy na tablicy znajdujacej sie w Parameters   public double[][][] Population; // [2][popsize][popsize]
@@ -130,6 +131,7 @@ namespace EvolutionaryAlgorithmApp
   
                 Selection(Population, ref PopulationAfterSelection);
 
+                Function2ValueCountForAllPopulation(PopulationAfterSelection, ref PopulationFunctionValueAfterSelection);
 
                 // selekcja ruletkowa --> obliczamy fitness, jaki to jest procent z calosci dla danego osobnika, obliczamy dystrybuante,
                 // generujemy liczby losowe i szeregujemy okreslajac ktore elementy maja przetrwac
@@ -175,6 +177,9 @@ namespace EvolutionaryAlgorithmApp
                 Array.Clear(PopulationAfterMutation, 0, PopulationAfterMutation.Length);
                 Array.Clear(PopulationAfterCrossing, 0, PopulationAfterCrossing.Length);
 
+                Array.Clear(PopulationFunctionValue, 0, PopulationFunctionValue.Length);
+                Array.Clear(PopulationFunctionValueAfterSelection, 0, PopulationFunctionValueAfterSelection.Length);
+
                 // finalne utworzenie wykresu dziedziny oraz pareto frontu a takze wykresu wartosci poszczegolnych funkcji
 
                 // jezeli przez 5 iteracji nie ma poprawy minimum zatrzymujemy algorytm
@@ -201,6 +206,8 @@ namespace EvolutionaryAlgorithmApp
             PopulationAfterSelection = _parameters.PopulationAfterSelection;
             PopulationAfterMutation = _parameters.PopulationAfterMutation;
             PopulationAfterCrossing = _parameters.PopulationAfterCrossing;
+            PopulationFunctionValue = _parameters.PopulationFunctionValue;
+            PopulationFunctionValueAfterSelection = _parameters.PopulationFunctionValueAfterSelection;
             MinF1 = _parameters.MinF1;
             MinF2 = _parameters.MinF2;
             Minimum = _parameters.Minimum;
@@ -209,88 +216,21 @@ namespace EvolutionaryAlgorithmApp
             _parameters.ListOfPoints = new LiveCharts.ChartValues<ObservablePoint>();
         }
 
-        #region Stary Core
-        // Serce programu wszystko bedzie odbwac sie wlasnie tutaj
-        //private void EvolutionaryCore()
-        //{
-        //    // ta metoda bedzie wywolywana po nacisnieciu przycisku start - przerywana jest dopiero
-        //    // w momencie gdy nacisnie sie przycisk stop
-        //    // iteracje maja timer po to aby mozna bylo zauwazyc na interfejsie ksztaltowanie punktow
-        //    // dzieki wykorzystaniu async await workerow interfejs graficzny nie bedzie blokowany
-        //    InitializePopulation(ref Population, Pop_Size);
-        //    InitializePopulation(ref PopulationAfterSelection, Pop_Size / 2);
-        //    InitializePopulation(ref PopulationAfterCrossing, Pop_Size / 4);
+        private double Function2Value(double[] Chromosome)
+        {
+            double FunctionValue = 0;
+            FunctionValue = ((1 + Chromosome[1]) / Chromosome[0]);
+            return FunctionValue;
+        }
 
-
-
-        //    // teraz ta petla ma byc przerwana kiedy nacisniemy stop
-        //    while (true)
-        //    {
-        //        // czas na obserwacje popsize'a i wykresu wartosci funkcji
-
-        //        // wszystkie operacje wykonujemy na tablicy znajdujacej sie w Parameters   public double[][][] Population; // [2][popsize][popsize]
-
-        //        FillRandomValues(ref Population);
-        //       
-
-        //        // operacja selekcji
-
-        //        // 2 warianty i tutaj trzeba zrobic ze na zasadzie losowej jest wybierana metoda selekcji
-
-        //        // selekcja turniejowa --> losujemy 2 punkty z populacji i wygrywa lepszy (o mniejszej wartosci), 
-        //        // dzielimy popsize na 2 rowne zbiory i jeden zbior jest porownywany wzgledem f1 a drugi wzgledem f2
-
-        //        Selection(Population, ref PopulationAfterSelection);
-
-
-
-        //        // selekcja ruletkowa --> obliczamy fitness, jaki to jest procent z calosci dla danego osobnika, obliczamy dystrybuante,
-        //        // generujemy liczby losowe i szeregujemy okreslajac ktore elementy maja przetrwac
-
-        //        // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
-
-
-        //        // operacja mutacji
-
-        //        Mutation(ref PopulationAfterCrossing);
-        //        // losujemy ktore punkty zostana poddane mutacji (sprawdzamy wszystkie pod wzgledem prawdopodobienstwa) (prawdopodobienstwo mutacji dla kazdego osobnika)
-        //        // jezeli wylosowano osobnika to losujemy kat oraz dlugosc wektora
-        //        // sprawdzamy czy zmutowany osobnik znajduje sie w dziedzinie
-        //        // jezeli nie wykorzystujemy funkcje kary aby zwiekszyc wartosc osobnika
-
-        //        // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
-
-
-        //        // operacja krzyzowania
-        //        // to jest chyba najtrudniejsza operacja, duzo pierdolenia z przeksztalceniami
-        //        // ogolnie to staramy sie tak skrzyzowac aby np calkowicie odbic jeden punkt 
-        //        // do dyskusji jak to robimy
-
-        //        PopulationAfterCrossing = Crossing(PopulationAfterSelection);
-
-        //        // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
-
-
-
-        //        // obliczenie minimum
-        //        SearchForMinValue(PopulationAfterCrossing, ref MinF1, ref MinF2);
-
-        //        Minimum = $"{{{MinF1}.{MinF2}}}";
-
-
-        //        Array.Clear(Population, 0, Population.Length);
-        //        Array.Copy(PopulationAfterCrossing, Population, Population.Length);
-
-        //        // finalne utworzenie wykresu dziedziny oraz pareto frontu a takze wykresu wartosci poszczegolnych funkcji
-
-        //        // jezeli przez 5 iteracji nie ma poprawy minimum zatrzymujemy algorytm
-
-        //        // musimy obliczyc jeszcze to spierdolone odchylenie
-        //        // suma po wszystkich punktach w populacji (od i do licznosci pareto frontu) |f(f1) - f2|
-        //    }
-        //}
-
-        #endregion
+        private void Function2ValueCountForAllPopulation(double[][] Population, ref double[][] PopulationFunctionValue)
+        {
+            for (int i = 0; i < Population.Length; i++)
+            {
+                PopulationFunctionValue[i][0] = Population[i][0];
+                PopulationFunctionValue[i][1] = Function2Value(Population[i]);
+            }
+        }
 
         private void SearchForMinValue(double[][] PopulationAfterCrossing, ref double MinF1, ref double MinF2)
         {
@@ -345,6 +285,8 @@ namespace EvolutionaryAlgorithmApp
             HashSet<int> numbers1 = new HashSet<int>();
             HashSet<int> numbers2 = new HashSet<int>();
 
+            Function2ValueCountForAllPopulation(Population, ref PopulationFunctionValue);
+
             for (int i = 0; i < Pop_Size/4; i++)
             {
 
@@ -363,7 +305,7 @@ namespace EvolutionaryAlgorithmApp
                     numbers2.Add(trandom2);
                 }
 
-                if (Population[trandom1][0] < Population[trandom2][0])
+                if (PopulationFunctionValue[trandom1][0] < PopulationFunctionValue[trandom2][0])
                 {
                     PopulationAfterSelection[i][0] = Population[trandom1][0];
                     PopulationAfterSelection[i][1] = Population[trandom1][1];
@@ -394,7 +336,7 @@ namespace EvolutionaryAlgorithmApp
                 }
                
 
-                if (Population[trandom1][1] < Population[trandom2][1])
+                if (PopulationFunctionValue[trandom1][1] < PopulationFunctionValue[trandom2][1])
                 {
                     PopulationAfterSelection[i][0] = Population[trandom1][0];
                     PopulationAfterSelection[i][1] = Population[trandom1][1];
@@ -494,7 +436,7 @@ namespace EvolutionaryAlgorithmApp
 
 
                     // tabela pomocnicza jednowymiarowa z wyliczonymi współrzędnymi nowego osobnika
-                    double[] tab = CreatePointUsingLines(Population[trandom1][0], Population[trandom1][1], Population[trandom2][0], Population[trandom2][1], 0, 0.25, 0, 0.25);
+                    double[] tab = CreatePointUsingLines(Population[trandom1][0], Population[trandom1][1], Population[trandom2][0], Population[trandom2][1], 0, 0.2, 0, 0.2);
 
                     PopulationAfterCrossing[i][0] = tab[0];
                     PopulationAfterCrossing[i][1] = tab[1];
