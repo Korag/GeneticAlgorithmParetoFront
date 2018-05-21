@@ -51,7 +51,7 @@ namespace EvolutionaryAlgorithmApp
             ListOfPoints = new ChartValues<ObservablePoint>();
             for (int i = 0; i < tempTab.Length; i++)
             {
-                ListOfPoints.Add(new ObservablePoint(tempTab[i][0], tempTab[i][1]));
+                ListOfPoints.Add(new ObservablePoint(Math.Round(tempTab[i][0],2) , Math.Round(tempTab[i][1],2)));
             }
         }
 

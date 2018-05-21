@@ -98,7 +98,7 @@ namespace EvolutionaryAlgorithmApp
                 _parameters.ListOfPoints.Add(new ObservablePoint(trandom.NextDouble(F1LeftConstraint, F1RightConstraint), 
                                                                 trandom.NextDouble(F2LeftConstraint, F2RightConstraint)
                                                                 ));
-                wykres.EditSeriesCollection(_parameters.ListOfPoints);
+                wykres.EditBSeriesCollection(_parameters.ListOfPoints);
             }
 
      
@@ -164,8 +164,14 @@ namespace EvolutionaryAlgorithmApp
 
                 // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
 
-                _parameters.RewriteThePoints(PopulationAfterCrossing);
-                wykres.EditSeriesCollection(_parameters.ListOfPoints);
+                _parameters.RewriteThePoints(PopulationAfterSelection);
+                wykres.EditASeriesCollection(_parameters.ListOfPoints);
+
+
+                
+
+                _parameters.RewriteThePoints(PopulationFunctionValueAfterSelection);
+                ParetoChart.EditSeriesCollection(_parameters.ListOfPoints);
 
                 // obliczenie minimum
                 SearchForMinValue(PopulationAfterCrossing, ref MinF1, ref MinF2);
@@ -173,6 +179,7 @@ namespace EvolutionaryAlgorithmApp
                 _parameters.Minimum = $"{{{Math.Round(MinF1,2)}.{Math.Round(MinF2,2)}}}";
 
                 // przepisywanie tablicy PopulationAfterCrossing do Population
+                
                 Array.Clear(Population, 0, Population.Length);
                 Array.Copy(PopulationAfterCrossing, Population, PopulationAfterCrossing.Length);
 
@@ -194,10 +201,12 @@ namespace EvolutionaryAlgorithmApp
 
                 // musimy obliczyc jeszcze to spierdolone odchylenie
                 // suma po wszystkich punktach w populacji (od i do licznosci pareto frontu) |f(f1) - f2|
-                Thread.Sleep(200);
+                
                 _parameters.IterationNumber++;
+                e.Cancel = true;
+                Thread.Sleep(4000);
             }
-
+            
         }
 
 
@@ -229,6 +238,10 @@ namespace EvolutionaryAlgorithmApp
         {
             double FunctionValue = 0;
             FunctionValue = ((1 + Chromosome[1]) / Chromosome[0]);
+            if (FunctionValue>50)
+            {
+                FunctionValue = 50;
+            }
             return FunctionValue;
         }
 
@@ -263,17 +276,17 @@ namespace EvolutionaryAlgorithmApp
         {
             for (int i = 0; i < Population.Length; i++)
             {
-            if (refill)
-            {
-                    for (int j = Pop_Size/4; j < Pop_Size; j++)
-                    {
-                        Population[j] = new double[2];
+                if (refill)
+                {
+                        for (int j = Pop_Size/4; j < Pop_Size; j++)
+                        {
+                            Population[j] = new double[2];
 
-                        Population[j][0] = trandom.NextDouble(F1LeftConstraint, F1RightConstraint);
-                        Population[j][1] = trandom.NextDouble(F2LeftConstraint, F2RightConstraint);
-                    }
-                    break;
-            }
+                            Population[j][0] = trandom.NextDouble(F1LeftConstraint, F1RightConstraint);
+                            Population[j][1] = trandom.NextDouble(F2LeftConstraint, F2RightConstraint);
+                        }
+                        break;
+                }
              Population[i][0] = trandom.NextDouble(F1LeftConstraint, F1RightConstraint);
              Population[i][1] = trandom.NextDouble(F2LeftConstraint, F2RightConstraint);
 
@@ -540,6 +553,9 @@ namespace EvolutionaryAlgorithmApp
 
         private void Stop_Click(object sender, RoutedEventArgs e)
         {
+            worker.WorkerSupportsCancellation = true;
+            worker.CancelAsync();
+
             // zatrzymujemy w dowolnym momencie (po danej skonczonej iteracji) dzialanie algorytmu
         }
 

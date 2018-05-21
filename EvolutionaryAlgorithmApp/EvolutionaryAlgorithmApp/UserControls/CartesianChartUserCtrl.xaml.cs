@@ -27,7 +27,7 @@ namespace EvolutionaryAlgorithmApp.UserControls
     public partial class CartesianChartUserCtrl : UserControl, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-
+        ChartValues<ObservablePoint> TempCollection;
         private Parameters _Parameters = new Parameters();
 
 
@@ -59,12 +59,20 @@ namespace EvolutionaryAlgorithmApp.UserControls
 
         }
 
-        public void EditSeriesCollection(ChartValues<ObservablePoint> NewCollection)
+        public void EditASeriesCollection(ChartValues<ObservablePoint> NewCollection)
+        {
+            ValuesA = NewCollection;
+            if (TempCollection!=null)
+            {
+                ValuesB = TempCollection;
+            }
+            TempCollection = NewCollection;
+        }
+
+        public void EditBSeriesCollection(ChartValues<ObservablePoint> NewCollection)
         {
             ValuesA = NewCollection;
         }
-
-
         public SeriesCollection SeriesCollection { get; set; }
         public string[] Labels { get; set; }
         public Func<double, string> YFormatter { get; set; }
