@@ -8,50 +8,50 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <lvc:CartesianChart Series="{Binding SeriesCollection}" Margin="0 0 0 40">
 
-            <lvc:CartesianChart.AxisY>
-                <lvc:Axis ShowLabels="False">
-                    <lvc:Axis.Separator>
+        <lvc:CartesianChart Series="{Binding SeriesCollection}" Margin="5 0 -2 15">
+
+            <lvc:CartesianChart.AxisY >
+                <lvc:Axis ShowLabels="False" DataContext="{Binding Source={x:Reference AxisY}, Path=DataContext}" >
+                    <lvc:Axis.Separator >
                         <lvc:Separator IsEnabled="False" Step="0.2"></lvc:Separator>
                     </lvc:Axis.Separator>
                 </lvc:Axis>
             </lvc:CartesianChart.AxisY>
 
             <lvc:CartesianChart.AxisX>
-                <lvc:Axis ShowLabels="False">
+                <lvc:Axis ShowLabels="False" >
                     <lvc:Axis.Separator>
                         <lvc:Separator IsEnabled="False" Step="0.2"></lvc:Separator>
                     </lvc:Axis.Separator>
                 </lvc:Axis>
             </lvc:CartesianChart.AxisX>
         </lvc:CartesianChart>
-
-        <lvc:CartesianChart LegendLocation="Bottom" Margin="0 5 0 0">
+        <lvc:CartesianChart  Margin="0 0 0 0" >
             <lvc:CartesianChart.Series>
-                <lvc:ScatterSeries Title="Series A" Values="{Binding ValuesA , FallbackValue=null}" />
-                <lvc:ScatterSeries Title="Series B" Values="{Binding ValuesB , FallbackValue=null}"
-                                   PointGeometry="{x:Static lvc:DefaultGeometries.Diamond}" />
-                <!--<lvc:ScatterSeries Title="Series C" Values="{Binding ValuesC}"
+                <lvc:ScatterSeries Title="Value of Current Population" Values="{Binding ValuesA , FallbackValue=null}" />
+                <lvc:ScatterSeries Title="Population outside the Domain" Values="{Binding ValuesC}"
                                    PointGeometry="{x:Static lvc:DefaultGeometries.Triangle}"
-                                   StrokeThickness="2" Fill="Transparent"/>-->
+                                   StrokeThickness="2" Fill="Transparent"/>
             </lvc:CartesianChart.Series>
             <lvc:CartesianChart.AxisY>
                 <!--setting the axis unit improved the labels rounding rule-->
-                <lvc:Axis Unit="1">
+                <lvc:Axis Unit="1" Foreground="Black" Name="AxisY">
                     <lvc:Axis.Separator>
-                        <lvc:Separator Step="1"></lvc:Separator>
+                        <lvc:Separator IsEnabled="False"  Step="2"></lvc:Separator>
                     </lvc:Axis.Separator>
                 </lvc:Axis>
             </lvc:CartesianChart.AxisY>
             <lvc:CartesianChart.AxisX>
                 <!--setting the axis unit improved the labels rounding rule-->
-                <lvc:Axis Unit="1">
+                <lvc:Axis Unit="1" Foreground="Black" Name="AxisX">
                     <lvc:Axis.Separator>
-                        <lvc:Separator Step="1"></lvc:Separator>
+                        <lvc:Separator IsEnabled="False" Step="0.2"></lvc:Separator>
                     </lvc:Axis.Separator>
                 </lvc:Axis>
             </lvc:CartesianChart.AxisX>
         </lvc:CartesianChart>
+        
+
     </Grid>
 </UserControl>

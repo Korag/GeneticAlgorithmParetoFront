@@ -50,6 +50,7 @@ namespace EvolutionaryAlgorithmApp
         private double[][] PopulationFunctionValue;
         private double[][] PopulationFunctionValueAfterSelection;
         private double[][] PopulationFunctionValueAfterCrossing;
+        private List<double[]> PopulationOutsideTheDomain;
         private double MinF1;
         private double MinF2;
         private string Minimum;
@@ -57,7 +58,7 @@ namespace EvolutionaryAlgorithmApp
 
         private int IterationLimit;
         private int IterationNumber;
-
+        private bool _Stop = false;
 
 
         public MainWindow()
@@ -73,6 +74,7 @@ namespace EvolutionaryAlgorithmApp
             // zrobic zapisa pareto frontu do pliku
 
             InitializeComponent();
+
 
 
             worker.DoWork += worker_DoWork;
@@ -98,12 +100,12 @@ namespace EvolutionaryAlgorithmApp
                 _parameters.ListOfPoints.Add(new ObservablePoint(trandom.NextDouble(F1LeftConstraint, F1RightConstraint), 
                                                                 trandom.NextDouble(F2LeftConstraint, F2RightConstraint)
                                                                 ));
-                wykres.EditBSeriesCollection(_parameters.ListOfPoints);
+                DomainChart.EditBSeriesCollection(_parameters.ListOfPoints);
             }
 
      
 
-            while (_parameters.IterationNumber<_parameters.IterationLimit)
+            while (_parameters.IterationNumber<_parameters.IterationLimit&&!_Stop)
             {
                 // inicjalizacja tablic
                 InitializePopulation(ref PopulationAfterSelection, Pop_Size / 2);
@@ -137,11 +139,29 @@ namespace EvolutionaryAlgorithmApp
 
                 Function2ValueCountForAllPopulation(PopulationAfterSelection, ref PopulationFunctionValueAfterSelection);
 
+              
+
                 // selekcja ruletkowa --> obliczamy fitness, jaki to jest procent z calosci dla danego osobnika, obliczamy dystrybuante,
                 // generujemy liczby losowe i szeregujemy okreslajac ktore elementy maja przetrwac
 
                 // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
 
+                _parameters.RewriteThePoints(PopulationAfterSelection);
+                DomainChart.EditASeriesCollection(_parameters.ListOfPoints);
+
+                CheckDomain(ref PopulationOutsideTheDomain, PopulationAfterSelection);
+                _parameters.RewriteThePoints(PopulationOutsideTheDomain);
+                DomainChart.SetPointsOutsideTheDomain(_parameters.ListOfPoints);
+
+
+                _parameters.RewriteThePoints(PopulationFunctionValueAfterSelection);
+                ParetoChart.EditSeriesCollection(_parameters.ListOfPoints);
+
+                CheckParetoDomain(ref PopulationOutsideTheDomain, PopulationFunctionValueAfterSelection);
+                _parameters.RewriteThePoints(PopulationOutsideTheDomain);
+                ParetoChart.SetPointsOutsideTheDomain(_parameters.ListOfPoints);
+
+                MainChart.EditSeriesCollection(PopulationFunctionValueAfterSelection, _parameters.IterationNumber);
 
                 // operacja
                 Mutation(PopulationAfterSelection, ref PopulationAfterMutation);
@@ -164,19 +184,11 @@ namespace EvolutionaryAlgorithmApp
 
                 // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
 
-                _parameters.RewriteThePoints(PopulationAfterSelection);
-                wykres.EditASeriesCollection(_parameters.ListOfPoints);
-
-
-                
-
-                _parameters.RewriteThePoints(PopulationFunctionValueAfterSelection);
-                ParetoChart.EditSeriesCollection(_parameters.ListOfPoints);
 
                 // obliczenie minimum
-                SearchForMinValue(PopulationAfterCrossing, ref MinF1, ref MinF2);
+                SearchForMinValue(PopulationFunctionValueAfterSelection, ref MinF1, ref MinF2);
 
-                _parameters.Minimum = $"{{{Math.Round(MinF1,2)}.{Math.Round(MinF2,2)}}}";
+                _parameters.Minimum = $"{{{Math.Round(MinF1,2)};{Math.Round(MinF2,2)}}}";
 
                 // przepisywanie tablicy PopulationAfterCrossing do Population
                 
@@ -234,16 +246,73 @@ namespace EvolutionaryAlgorithmApp
             _parameters.ListOfPoints = new LiveCharts.ChartValues<ObservablePoint>();
         }
 
+        private void CheckDomain(ref List<double[]> PointsOutsideTheDomain, double[][] ListOfPoints)
+        {
+            PointsOutsideTheDomain = new List<double[]>();
+            for (int i = 0; i < ListOfPoints.Length; i++)
+            {
+                if (ListOfPoints[i][0]<F1LeftConstraint || ListOfPoints[i][0] > F1RightConstraint)
+                {
+                    PointsOutsideTheDomain.Add(ListOfPoints[i]);
+                }
+                //if (ListOfPoints[i][0] > F1RightConstraint)
+                //{
+                //    PointsOutsideTheDomain.Add(ListOfPoints[i]);
+                //}
+                if (ListOfPoints[i][1] < F2LeftConstraint || ListOfPoints[i][1] > F2RightConstraint)
+                {
+                    PointsOutsideTheDomain.Add(ListOfPoints[i]);
+                }
+                //if (ListOfPoints[i][1] > F2RightConstraint)
+                //{
+                //    PointsOutsideTheDomain.Add(ListOfPoints[i]);
+                //}
+            }      
+        }
+
+
+        private void CheckParetoDomain(ref List<double[]> PointsOutsideTheDomain, double[][] ListOfPoints)
+        {
+            PointsOutsideTheDomain = new List<double[]>();
+            double y = 0;
+            for (int i = 0; i < ListOfPoints.Length; i++)
+            {
+                y = (1 + ListOfPoints[i][1]) / ListOfPoints[i][0];
+                if (ListOfPoints[i][0] < F1LeftConstraint)
+                {
+                    PointsOutsideTheDomain.Add(ListOfPoints[i]);
+                }
+                //if (ListOfPoints[i][0] > F1RightConstraint)
+                //{
+                //    PointsOutsideTheDomain.Add(ListOfPoints[i]);
+                //}
+                if (ListOfPoints[i][1] > y)
+                {
+                    PointsOutsideTheDomain.Add(ListOfPoints[i]);
+                }
+                //if (ListOfPoints[i][1] > F2RightConstraint)
+                //{
+                //    PointsOutsideTheDomain.Add(ListOfPoints[i]);
+                //}
+            }
+        }
+
         private double Function2Value(double[] Chromosome)
         {
             double FunctionValue = 0;
             FunctionValue = ((1 + Chromosome[1]) / Chromosome[0]);
-            if (FunctionValue>50)
+            if (FunctionValue>80)
             {
-                FunctionValue = 50;
+                FunctionValue = 80;
+            }
+            if (FunctionValue < -30)
+            {
+                FunctionValue = -30;
             }
             return FunctionValue;
         }
+
+        
 
         private void Function2ValueCountForAllPopulation(double[][] Population, ref double[][] PopulationFunctionValue)
         {
@@ -531,8 +600,10 @@ namespace EvolutionaryAlgorithmApp
             double a = trandom.NextDouble(BeginOdlegloscOdProstej, EndOdlegloscOdProstej);
 
             // Piękna funkcja na prostą przechodzącą przez dwa punkty, tab[0] to losowy x dla tworzonego punktu, tab[1] to y nowego punktu liczony na podstawie wzoru
-            tab[1] = (((ya - yb) / (xa - xb)) * tab[0]) + ((ya - ((ya - yb) / (ya - xb))) * xa);
+            //tab[1] = (((ya - yb) / (xa - xb)) * tab[0]) + ((ya - ((ya - yb) / (ya - xb))) * xa);
 
+
+            tab[1] = ((yb - ya) * (tab[0] - xa) + ya * xb - ya * xb) / (xb - xa);
             return tab;
         }
 
@@ -544,7 +615,7 @@ namespace EvolutionaryAlgorithmApp
             Start.IsEnabled = false;
             ParetoChart.MakeParetoFunctions();
             ReinitializeVariables();
-
+            _Stop = false;
             InitializePopulation(ref Population, Pop_Size);
             worker.RunWorkerAsync();
             //EvolutionaryCore();
@@ -553,8 +624,7 @@ namespace EvolutionaryAlgorithmApp
 
         private void Stop_Click(object sender, RoutedEventArgs e)
         {
-            worker.WorkerSupportsCancellation = true;
-            worker.CancelAsync();
+            _Stop = true;
 
             // zatrzymujemy w dowolnym momencie (po danej skonczonej iteracji) dzialanie algorytmu
         }

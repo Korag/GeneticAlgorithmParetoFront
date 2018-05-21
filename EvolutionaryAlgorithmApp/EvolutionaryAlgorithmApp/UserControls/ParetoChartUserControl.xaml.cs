@@ -29,38 +29,7 @@ namespace EvolutionaryAlgorithmApp.UserControls
         public event PropertyChangedEventHandler PropertyChanged;
 
         private Parameters _parameters = ConnectionHelper.ParametersObject;
-        //private double? F1LeftConstraint
-        //{
-        //    get { return _Parameters.F1LeftConstraint; }
-        //    set { _Parameters.F1LeftConstraint = value; }
-        //}
-        //private double? F1RightConstraint
-        //{
-        //    get { return _Parameters.F1RightConstraint; }
-        //    set { _Parameters.F1RightConstraint = value; }
-        //}
-        //private double? F2LeftConstraint
-        //{
-        //    get { return _Parameters.F2LeftConstraint; }
-        //    set { _Parameters.F2LeftConstraint = value; }
-        //}
-        //private double? F2RightConstraint
-        //{
-        //    get { return _Parameters.F2RightConstraint; }
-        //    set { _Parameters.F2RightConstraint = value; }
-        //}
 
-        //public new string Name2
-        //{
-        //    get { return _Parameters.Name; }
-        //    set { _Parameters.Name = value; }
-        //}
-
-        //public ChartValues<ObservablePoint> PointSeries
-        //{
-        //    get { return _Parameters.ListOfPoints; }
-        //    set { _Parameters.ListOfPoints = value; }
-        //}
 
         private double? F1LeftConstraint;
         private double? F1RightConstraint;
@@ -72,6 +41,7 @@ namespace EvolutionaryAlgorithmApp.UserControls
 
         public ChartValues<ObservablePoint> ValuesA { get; set; } = null;
         public ChartValues<ObservablePoint> ValuesB { get; set; } = null;
+        public ChartValues<ObservablePoint> ValuesC { get; set; } = null;
         //public ChartValues<ObservablePoint> ValuesC { get; set; }
 
         public ParetoChartUserControl()
@@ -81,23 +51,14 @@ namespace EvolutionaryAlgorithmApp.UserControls
             var r = new Random();
             ValuesA = new ChartValues<ObservablePoint>();
             ValuesB = new ChartValues<ObservablePoint>();
+            ValuesC = new ChartValues<ObservablePoint>();
 
             SeriesCollection = new SeriesCollection();
 
 
-            YFormatter = value => value.ToString("C");
+            YFormatter = value => value.ToString();
 
-            //modifying the series collection will animate and update the chart
-            SeriesCollection.Add(new LineSeries
-            {
-                Title = "Series 4",
-                Values = new ChartValues<double>(),
-                LineSmoothness = 0, //0: straight lines, 1: really smooth lines
-            });
-
-            //modifying any series values will also animate and update the chart
-            SeriesCollection[0].Values.Add(5d);
-
+      
             DataContext = this;
 
         }
@@ -121,29 +82,35 @@ namespace EvolutionaryAlgorithmApp.UserControls
                 {
                     Title = "Bottom Pareto",
                     Values = CreateBottomPareto(),
-                    LineSmoothness = 0
+                    Fill = Brushes.Transparent,
+                    Stroke = Brushes.Green,
+                    LineSmoothness = 0.7
                 },
                 new LineSeries
                 {
                     Title = "Top Pareto",
                     Values = CreateTopPareto(),
-                    LineSmoothness = 0
+                    Fill = Brushes.Transparent,
+                    Stroke = Brushes.Red,
+                    LineSmoothness = 0.7
                 },
             };
         }
 
-
         
-
         public void EditSeriesCollection(ChartValues<ObservablePoint> NewCollection)
         {
             ValuesA = NewCollection;
         }
 
+        public void SetPointsOutsideTheDomain(ChartValues<ObservablePoint> NewCollection)
+        {
+            ValuesC = NewCollection;
+        }
         private ChartValues<double> CreateBottomPareto()
         {
             ChartValues<double> tempArray = new ChartValues<double>();
-            for (double i = (double)F1LeftConstraint, j  = (double) F2LeftConstraint; i < F1RightConstraint; i+=0.2, j += 0.2)
+            for (double i = (double)F1LeftConstraint, j  = (double) F2LeftConstraint; i <= F1RightConstraint; i+=0.2, j += 0.2)
             {
 
                 tempArray.Add((1 + j) / i);
@@ -156,20 +123,27 @@ namespace EvolutionaryAlgorithmApp.UserControls
         {
             ChartValues<double> tempArray = new ChartValues<double>();
             double x = (double)F1LeftConstraint;
+
             for (double i = (double)F1LeftConstraint, j = (double)F2LeftConstraint; i < F1RightConstraint; i += 0.2, j += 0.2)
             {
-                if (i< F1RightConstraint - F1LeftConstraint)
-                {                   
-                    tempArray.Add(0);
-                }
-                else
-                {
-                    
-                    tempArray.Add((1 + j) / x);
-                    x += 0.2;
-                }
-                
+
+                tempArray.Add((double)F2RightConstraint/(double)F1LeftConstraint + (1 + j) / i);
             }
+
+            //for (double i = (double)F1LeftConstraint, j = (double)F2LeftConstraint; i < F1RightConstraint; i += 0.2, j += 0.2)
+            //{
+            //    if (i< F1RightConstraint - F1LeftConstraint)
+            //    {                   
+            //        tempArray.Add(0);
+            //    }
+            //    else
+            //    {
+
+            //        tempArray.Add((1 + j) / x);
+            //        x += 0.2;
+            //    }
+
+            //}
 
             return tempArray;
         }

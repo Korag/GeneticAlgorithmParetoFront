@@ -44,6 +44,8 @@ namespace EvolutionaryAlgorithmApp.UserControls
         }
         public ChartValues<ObservablePoint> ValuesA { get; set; } = null;
         public ChartValues<ObservablePoint> ValuesB { get; set; } = null;
+
+        public ChartValues<ObservablePoint> ValuesC { get; set; } = null;
         //public ChartValues<ObservablePoint> ValuesC { get; set; }
 
         public CartesianChartUserCtrl()
@@ -53,8 +55,10 @@ namespace EvolutionaryAlgorithmApp.UserControls
             var r = new Random();
             ValuesA = new ChartValues<ObservablePoint>();
             ValuesB = new ChartValues<ObservablePoint>();
+            ValuesC = new ChartValues<ObservablePoint>();
 
-
+            
+            
             DataContext = this;
 
         }
@@ -69,6 +73,10 @@ namespace EvolutionaryAlgorithmApp.UserControls
             TempCollection = NewCollection;
         }
 
+        public void SetPointsOutsideTheDomain(ChartValues<ObservablePoint> NewCollection)
+        {
+            ValuesC = NewCollection;
+        }
         public void EditBSeriesCollection(ChartValues<ObservablePoint> NewCollection)
         {
             ValuesA = NewCollection;

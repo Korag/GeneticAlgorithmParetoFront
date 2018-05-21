@@ -10,12 +10,12 @@
     <Grid>
         <lvc:CartesianChart LegendLocation="Bottom">
             <lvc:CartesianChart.Series>
-                <lvc:ScatterSeries Title="Series A" Values="{Binding ValuesA , FallbackValue=null}" />
-                <lvc:ScatterSeries Title="Series B" Values="{Binding ValuesB , FallbackValue=null}"
+                <lvc:ScatterSeries Title="Current Population" Values="{Binding ValuesA , FallbackValue=null}" />
+                <lvc:ScatterSeries Title="Previous Population" Values="{Binding ValuesB , FallbackValue=null}"
                                    PointGeometry="{x:Static lvc:DefaultGeometries.Diamond}" />
-                <!--<lvc:ScatterSeries Title="Series C" Values="{Binding ValuesC}"
+                <lvc:ScatterSeries Title="Population outside the Domain" Values="{Binding ValuesC}"
                                    PointGeometry="{x:Static lvc:DefaultGeometries.Triangle}"
-                                   StrokeThickness="2" Fill="Transparent"/>-->
+                                   StrokeThickness="2" Fill="Transparent"/>
             </lvc:CartesianChart.Series>
             <lvc:CartesianChart.AxisY>
                 <!--setting the axis unit improved the labels rounding rule-->
