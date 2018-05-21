@@ -40,6 +40,7 @@ namespace EvolutionaryAlgorithmApp
 
         public double[][] PopulationFunctionValue;
         public double[][] PopulationFunctionValueAfterSelection;
+        public double[][] PopulationFunctionValueAfterCrossing;
 
         //minimum dla f1 oraz f2
         public double MinF1 { get; set; }

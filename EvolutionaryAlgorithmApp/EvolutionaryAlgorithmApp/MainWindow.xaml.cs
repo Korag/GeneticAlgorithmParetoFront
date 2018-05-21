@@ -49,6 +49,7 @@ namespace EvolutionaryAlgorithmApp
         private double[][] PopulationAfterCrossing;
         private double[][] PopulationFunctionValue;
         private double[][] PopulationFunctionValueAfterSelection;
+        private double[][] PopulationFunctionValueAfterCrossing;
         private double MinF1;
         private double MinF2;
         private string Minimum;
@@ -111,14 +112,13 @@ namespace EvolutionaryAlgorithmApp
 
                 InitializePopulation(ref PopulationFunctionValue, Pop_Size);
                 InitializePopulation(ref PopulationFunctionValueAfterSelection, Pop_Size/2);
+                InitializePopulation(ref PopulationFunctionValueAfterCrossing, Pop_Size / 4);
 
                 // czas na obserwacje popsize'a i wykresu wartosci funkcji
 
                 // wszystkie operacje wykonujemy na tablicy znajdujacej sie w Parameters   public double[][][] Population; // [2][popsize][popsize]
 
                 FillRandomValues(ref Population);
-                // parametr, aby w nastepnej iteracji uzupelnic brakujace osobniki w populacji
-                refill = true;
 
                 // operacja selekcji
 
@@ -130,6 +130,10 @@ namespace EvolutionaryAlgorithmApp
 
   
                 Selection(Population, ref PopulationAfterSelection);
+
+                // parametr, aby w nastepnej iteracji uzupelnic brakujace osobniki w populacji
+                refill = true;
+
 
                 Function2ValueCountForAllPopulation(PopulationAfterSelection, ref PopulationFunctionValueAfterSelection);
 
@@ -172,13 +176,17 @@ namespace EvolutionaryAlgorithmApp
                 Array.Clear(Population, 0, Population.Length);
                 Array.Copy(PopulationAfterCrossing, Population, PopulationAfterCrossing.Length);
 
+                // przepisywanie tablicy PopulationFunctionValueAfterCrossing do PopulationFunctionValue
+                Array.Clear(PopulationFunctionValue, 0, PopulationFunctionValue.Length);
+                Array.Copy(PopulationFunctionValueAfterCrossing, PopulationFunctionValue, PopulationFunctionValueAfterCrossing.Length);
+
                 // czyszczenie tablic
                 Array.Clear(PopulationAfterSelection, 0, PopulationAfterSelection.Length);
                 Array.Clear(PopulationAfterMutation, 0, PopulationAfterMutation.Length);
                 Array.Clear(PopulationAfterCrossing, 0, PopulationAfterCrossing.Length);
 
-                Array.Clear(PopulationFunctionValue, 0, PopulationFunctionValue.Length);
                 Array.Clear(PopulationFunctionValueAfterSelection, 0, PopulationFunctionValueAfterSelection.Length);
+                Array.Clear(PopulationFunctionValueAfterCrossing, 0, PopulationFunctionValueAfterCrossing.Length);
 
                 // finalne utworzenie wykresu dziedziny oraz pareto frontu a takze wykresu wartosci poszczegolnych funkcji
 
@@ -208,6 +216,7 @@ namespace EvolutionaryAlgorithmApp
             PopulationAfterCrossing = _parameters.PopulationAfterCrossing;
             PopulationFunctionValue = _parameters.PopulationFunctionValue;
             PopulationFunctionValueAfterSelection = _parameters.PopulationFunctionValueAfterSelection;
+            PopulationFunctionValueAfterCrossing = _parameters.PopulationFunctionValueAfterCrossing;
             MinF1 = _parameters.MinF1;
             MinF2 = _parameters.MinF2;
             Minimum = _parameters.Minimum;
@@ -285,7 +294,21 @@ namespace EvolutionaryAlgorithmApp
             HashSet<int> numbers1 = new HashSet<int>();
             HashSet<int> numbers2 = new HashSet<int>();
 
-            Function2ValueCountForAllPopulation(Population, ref PopulationFunctionValue);
+            if (refill == true)
+            {
+                for (int j = Pop_Size / 4; j < Pop_Size; j++)
+                {
+                    PopulationFunctionValue[j] = new double[2];
+
+                    PopulationFunctionValue[j][0] = Population[j][0];
+                    PopulationFunctionValue[j][1] = Function2Value(Population[j]);
+                }
+            }
+            else
+            {
+                Function2ValueCountForAllPopulation(Population, ref PopulationFunctionValue);
+            }
+          
 
             for (int i = 0; i < Pop_Size/4; i++)
             {
@@ -364,10 +387,10 @@ namespace EvolutionaryAlgorithmApp
                     resultTable[i][0] = Math.Cos(Angle) * Radius + tempTab[i][0];
                     resultTable[i][1] = Math.Sin(Angle) * Radius + tempTab[i][1];
 
-                    if (CheckPointsDomain(resultTable[i][0], resultTable[i][1]))
-                    {
-                        resultTable[i][1] += 20;
-                    }
+                    //if (CheckPointsDomain(resultTable[i][0], resultTable[i][1]))
+                    //{
+                    //    resultTable[i][1] += 20;
+                    //}
 
 
 
@@ -436,20 +459,51 @@ namespace EvolutionaryAlgorithmApp
 
 
                     // tabela pomocnicza jednowymiarowa z wyliczonymi współrzędnymi nowego osobnika
-                    double[] tab = CreatePointUsingLines(Population[trandom1][0], Population[trandom1][1], Population[trandom2][0], Population[trandom2][1], 0, 0.2, 0, 0.2);
+                    double[] tab = CreatePointUsingLines(Population[trandom1][0], Population[trandom1][1], Population[trandom2][0], Population[trandom2][1], 0, 0.0001, 0, 0.0001);
 
                     PopulationAfterCrossing[i][0] = tab[0];
                     PopulationAfterCrossing[i][1] = tab[1];
 
+                    PopulationFunctionValueAfterCrossing[i][0] = PopulationAfterCrossing[i][0];
+                    PopulationFunctionValueAfterCrossing[i][1] = Function2Value(PopulationAfterCrossing[i]);
+
                     if (CheckPointsDomain(PopulationAfterCrossing[i][0], PopulationAfterCrossing[i][1]))
                     {
-                        PopulationAfterCrossing[i][1] += 20;
+                        if (PopulationFunctionValueAfterCrossing[i][0] < 0)
+                        {
+                            PopulationAfterCrossing[i][0] = -PopulationAfterCrossing[i][0];
+                        }
+
+                        if (PopulationFunctionValueAfterCrossing[i][1] < 0)
+                        {
+                            PopulationAfterCrossing[i][1] = -PopulationAfterCrossing[i][1];
+                        }
+
+                        if (PopulationAfterCrossing[i][0] > 20)
+                        {
+                            PopulationAfterCrossing[i][0] = PopulationAfterCrossing[i][0] / 2;
+                        }
+
+                        if (PopulationAfterCrossing[i][1] > 20)
+                        {
+                            PopulationAfterCrossing[i][1] = PopulationAfterCrossing[i][1] / 2;
+                        }
+
+                       
+                        PopulationFunctionValueAfterCrossing[i][0] = PopulationAfterCrossing[i][0];
+                        PopulationFunctionValueAfterCrossing[i][1] = Function2Value(PopulationAfterCrossing[i]);
+
+                        PopulationFunctionValueAfterCrossing[i][0] += 100;
+                        PopulationFunctionValueAfterCrossing[i][1] += 100;
                     }
                 }
                 else
                 {
                     PopulationAfterCrossing[i][0] = Population[i][0];
                     PopulationAfterCrossing[i][1] = Population[i][1];
+
+                    PopulationFunctionValueAfterCrossing[i][0] = PopulationAfterCrossing[i][0];
+                    PopulationFunctionValueAfterCrossing[i][1] = Function2Value(PopulationAfterCrossing[i]);
                 }
             }
         }
