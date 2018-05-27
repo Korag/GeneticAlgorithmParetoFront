@@ -139,12 +139,14 @@ namespace EvolutionaryAlgorithmApp
 
                 Function2ValueCountForAllPopulation(PopulationAfterSelection, ref PopulationFunctionValueAfterSelection);
 
-              
+
 
                 // selekcja ruletkowa --> obliczamy fitness, jaki to jest procent z calosci dla danego osobnika, obliczamy dystrybuante,
                 // generujemy liczby losowe i szeregujemy okreslajac ktore elementy maja przetrwac
 
                 // mozna tutaj juz wrzucic te osobniki na wykres dziedziny
+
+                
 
                 _parameters.RewriteThePoints(PopulationAfterSelection);
                 DomainChart.EditASeriesCollection(_parameters.ListOfPoints);
@@ -157,9 +159,14 @@ namespace EvolutionaryAlgorithmApp
                 _parameters.RewriteThePoints(PopulationFunctionValueAfterSelection);
                 ParetoChart.EditSeriesCollection(_parameters.ListOfPoints);
 
+                ParetoChart.MakeParetoFunctions(FindMinAndMax(PopulationFunctionValueAfterSelection));
+
                 CheckParetoDomain(ref PopulationOutsideTheDomain, PopulationFunctionValueAfterSelection);
                 _parameters.RewriteThePoints(PopulationOutsideTheDomain);
+
                 ParetoChart.SetPointsOutsideTheDomain(_parameters.ListOfPoints);
+
+
 
                 MainChart.EditSeriesCollection(PopulationFunctionValueAfterSelection, _parameters.IterationNumber);
 
@@ -270,9 +277,30 @@ namespace EvolutionaryAlgorithmApp
             }      
         }
 
+       private double[] FindMinAndMax(double[][] ArrayWithValues)
+       {
+            double[] tempArray = new double[2];
+            double min = ArrayWithValues[0][0];
+            double max = ArrayWithValues[0][0];
+            for (int i = 0; i < ArrayWithValues.Length; i++)
+            {
+                if (min > ArrayWithValues[i][0])
+                {
+                    min = ArrayWithValues[i][0];
+                }
+                if (max < ArrayWithValues[i][0])
+                {
+                    max = ArrayWithValues[i][0];
+                }
+            }
+            tempArray[0] = min;
+            tempArray[1] = max;
+            return tempArray;
+       }
 
         private void CheckParetoDomain(ref List<double[]> PointsOutsideTheDomain, double[][] ListOfPoints)
         {
+            
             PointsOutsideTheDomain = new List<double[]>();
             double y = 0;
             for (int i = 0; i < ListOfPoints.Length; i++)
@@ -613,7 +641,7 @@ namespace EvolutionaryAlgorithmApp
         private void Start_Click(object sender, RoutedEventArgs e)
         {
             Start.IsEnabled = false;
-            ParetoChart.MakeParetoFunctions();
+            
             ReinitializeVariables();
             _Stop = false;
             InitializePopulation(ref Population, Pop_Size);
