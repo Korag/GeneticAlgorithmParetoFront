@@ -149,6 +149,7 @@ namespace EvolutionaryAlgorithmApp
                 
 
                 _parameters.RewriteThePoints(PopulationAfterSelection);
+
                 DomainChart.EditASeriesCollection(_parameters.ListOfPoints);
 
                 CheckDomain(ref PopulationOutsideTheDomain, PopulationAfterSelection);
@@ -298,23 +299,45 @@ namespace EvolutionaryAlgorithmApp
             return tempArray;
        }
 
+        private void SecurityXD(ref double[][] PopulationToCheck)
+        {
+            for (int i = 0; i < PopulationToCheck.Length; i++)
+            {
+                if (PopulationToCheck[i][1]>40)
+                {
+                    PopulationToCheck[i][1] = 40;//stan nie ogarnie ^^
+                }
+            }
+        }
         private void CheckParetoDomain(ref List<double[]> PointsOutsideTheDomain, double[][] ListOfPoints)
         {
-            
+            List<double> yy = new List<double>();
             PointsOutsideTheDomain = new List<double[]>();
+            double blabla = F1RightConstraint - F1LeftConstraint;
+            double blabla2 = blabla / ListOfPoints.Length;
+            for (double i = (double)F1LeftConstraint, j = (double)F2LeftConstraint; i <= F1RightConstraint; i += blabla2, j += blabla2)
+            {
+
+                    yy.Add(((1 + j) / i));
+            }
+
             double y = 0;
             for (int i = 0; i < ListOfPoints.Length; i++)
             {
                 y = (1 + ListOfPoints[i][1]) / ListOfPoints[i][0];
-                if (ListOfPoints[i][0] < F1LeftConstraint)
-                {
-                    PointsOutsideTheDomain.Add(ListOfPoints[i]);
-                }
+                //if (ListOfPoints[i][0] < F1LeftConstraint)
+                //{
+                //    PointsOutsideTheDomain.Add(ListOfPoints[i]);
+                //}
                 //if (ListOfPoints[i][0] > F1RightConstraint)
                 //{
                 //    PointsOutsideTheDomain.Add(ListOfPoints[i]);
                 //}
-                if (ListOfPoints[i][1] > y)
+                if (ListOfPoints[i][1] < yy[i])
+                {
+                    PointsOutsideTheDomain.Add(ListOfPoints[i]);
+                }
+                if (ListOfPoints[i][1] > (yy[i] + (F2RightConstraint / F1LeftConstraint)))
                 {
                     PointsOutsideTheDomain.Add(ListOfPoints[i]);
                 }

@@ -128,10 +128,10 @@ namespace EvolutionaryAlgorithmApp.UserControls
         private ChartValues<double> CreateBottomPareto(double[] interval)
         {
             ChartValues<double> tempArray = new ChartValues<double>();
-            for (double i = interval[0], j  = (double) F2LeftConstraint; i <= interval[1]; i+=0.3, j += 0.2)
+            for (double i = (double)F1LeftConstraint, j  = (double) F2LeftConstraint; i <= (double)F1RightConstraint; i +=0.2, j += 0.3)
             {
 
-                tempArray.Add((1 + j) / i);
+                tempArray.Add(((1 + j) / i));
             }
 
             return tempArray;
@@ -142,7 +142,7 @@ namespace EvolutionaryAlgorithmApp.UserControls
             ChartValues<double> tempArray = new ChartValues<double>();
             double x = (double)F1LeftConstraint;
 
-            for (double i = interval[0], j = (double)F2LeftConstraint; i < interval[1]; i += 0.3, j += 0.2)
+            for (double i = (double)F1LeftConstraint, j = (double)F2LeftConstraint; i <= (double)F1RightConstraint; i += 0.2, j += 0.3)
             {
 
                 tempArray.Add((double)F2RightConstraint/(double)F1LeftConstraint + (1 + j) / i);
