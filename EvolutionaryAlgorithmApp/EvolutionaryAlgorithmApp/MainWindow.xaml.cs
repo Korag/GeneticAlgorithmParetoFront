@@ -541,7 +541,7 @@ namespace EvolutionaryAlgorithmApp
 
 
                     // tabela pomocnicza jednowymiarowa z wyliczonymi współrzędnymi nowego osobnika
-                    double[] tab = CreatePointUsingLines(Population[trandom1][0], Population[trandom1][1], Population[trandom2][0], Population[trandom2][1], 0, 0.0001, 0, 0.0001);
+                    double[] tab = CreatePointUsingLines(Population[trandom1][0], Population[trandom1][1], Population[trandom2][0], Population[trandom2][1], 0, 0.0001, 0.1,0.9);
 
                     PopulationAfterCrossing[i][0] = tab[0];
                     PopulationAfterCrossing[i][1] = tab[1];
@@ -660,7 +660,7 @@ namespace EvolutionaryAlgorithmApp
             _parameters.Popsize = 200;
             _parameters.PlausOfMutation = 0.2;
             _parameters.PlausOfCrossing = 0.6;
-            _parameters.Minimum = "EV MORONS";
+            _parameters.Minimum = "EV MIN";
             _parameters.SleepTime = 1;
             _parameters.IterationLimit = 200;
             _parameters.IterationNumber = 0;
